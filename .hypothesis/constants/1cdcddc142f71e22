@@ -1,0 +1,4 @@
+# file: D:\互联网+项目开发\06童话\backend\services\creation_service.py
+# hypothesis_version: 6.151.6
+
+['animated', 'animating', 'animation', 'artwork_id', 'completed', 'created_at', 'creations', 'enhanced', 'enhanced_image', 'enhancing', 'failed', 'id', 'limit', 'offset', 'original_image', 'status', 'story', 'story_gen', 'total', 'updated_at', 'uploaded', 'user_id']

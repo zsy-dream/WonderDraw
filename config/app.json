@@ -1,0 +1,38 @@
+{
+  "ai": {
+    "controlnet": {
+      "modelId": "runwayml/stable-diffusion-v1-5",
+      "controlnetId": "lllyasviel/control_v11p_sd15_scribble",
+      "prompt": "children's book illustration, colorful, cute, whimsical, high quality",
+      "negativePrompt": "ugly, blurry, low quality, dark, scary"
+    },
+    "svd": {
+      "modelId": "stabilityai/stable-video-diffusion-img2vid",
+      "fps": 24,
+      "minDuration": 2,
+      "maxDuration": 4
+    },
+    "llm": {
+      "provider": "deepseek",
+      "apiKey": "",
+      "apiUrl": "https://api.deepseek.com/v1/chat/completions",
+      "maxTokens": 500,
+      "temperature": 0.8
+    }
+  },
+  "storage": {
+    "basePath": "./storage",
+    "maxFileSize": 10485760,
+    "allowedFormats": ["jpg", "jpeg", "png", "webp"]
+  },
+  "ui": {
+    "colors": {
+      "background": "#FFF5E6",
+      "primary": "#FF6B6B",
+      "secondary": "#FFD93D"
+    },
+    "gallery": {
+      "itemsPerPage": 20
+    }
+  }
+}

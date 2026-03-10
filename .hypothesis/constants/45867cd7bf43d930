@@ -1,0 +1,4 @@
+# file: D:\互联网+项目开发\06童话\backend\models\__init__.py
+# hypothesis_version: 6.151.6
+
+['ControlNetProcessor', 'LLMProcessor', 'SVDProcessor']

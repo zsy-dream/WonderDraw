@@ -1,0 +1,68 @@
+{
+  "creations": [
+    {
+      "id": "0a8403a8-2007-449e-ace2-dcbd8ffda7a4",
+      "user_id": "bd1759eb-e38d-426d-956e-1b6eb60755b2",
+      "artwork_id": "ab19dc1d-f24c-4788-9887-f0ba072507f6",
+      "original_image": "http://localhost:5001/storage/images/original/ab19dc1d-f24c-4788-9887-f0ba072507f6_20260222_165438_watermarked.jpg",
+      "enhanced_image": "http://localhost:5001/storage/images/original/ab19dc1d-f24c-4788-9887-f0ba072507f6_20260222_165438_watermarked.jpg",
+      "animation": "https://www.w3schools.com/html/mov_bbb.mp4",
+      "story": "小兔子把愿望分享给了朋友们，大家手拉手一起许愿。奇迹发生了——森林里到处开满了五颜六色的花！",
+      "status": "completed",
+      "created_at": "2026-02-27T21:00:29.607682",
+      "updated_at": "2026-02-27T21:00:59.919023",
+      "interactive_story": {
+        "root": {
+          "content": "从前，在一个充满魔法的森林里，住着一只可爱的小兔子。它每天都在森林里探险，寻找新的朋友和有趣的故事。",
+          "choices": [
+            {
+              "id": "choice_1",
+              "text": "🌸 小兔子发现一朵会发光的花",
+              "next_node": "flower"
+            },
+            {
+              "id": "choice_2",
+              "text": "🦋 小兔子遇到一只会说话的蝴蝶",
+              "next_node": "butterfly"
+            },
+            {
+              "id": "choice_3",
+              "text": "🏠 小兔子找到一个神秘的小屋",
+              "next_node": "house"
+            }
+          ],
+          "is_endpoint": false
+        },
+        "butterfly": {
+          "content": "会说话的蝴蝶告诉小兔子，森林深处有一个彩虹湖，湖水可以实现一个愿望。",
+          "choices": [
+            {
+              "id": "b1",
+              "text": "🌈 去彩虹湖许愿",
+              "next_node": "rainbow_lake"
+            },
+            {
+              "id": "b2",
+              "text": "🎁 把愿望分享给朋友",
+              "next_node": "share_wish"
+            }
+          ],
+          "is_endpoint": false,
+          "id": "butterfly"
+        },
+        "share_wish": {
+          "content": "小兔子把愿望分享给了朋友们，大家手拉手一起许愿。奇迹发生了——森林里到处开满了五颜六色的花！",
+          "choices": [],
+          "is_endpoint": true,
+          "id": "share_wish"
+        }
+      },
+      "story_path": [
+        "root",
+        "butterfly",
+        "share_wish"
+      ],
+      "current_node": "share_wish"
+    }
+  ]
+}

@@ -1,0 +1,82 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Flask
+instance/
+.webassets-cache
+
+# Environment variables
+.env
+.env.local
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Build outputs
+dist/
+dist-ssr/
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Storage (keep structure, ignore content)
+storage/images/original/*
+!storage/images/original/.gitkeep
+storage/images/enhanced/*
+!storage/images/enhanced/.gitkeep
+storage/videos/*
+!storage/videos/.gitkeep
+storage/exports/posters/*
+!storage/exports/posters/.gitkeep
+storage/exports/ebooks/*
+!storage/exports/ebooks/.gitkeep
+storage/temp/*
+!storage/temp/.gitkeep
+
+# Data files (keep structure, ignore user data)
+storage/data/users.json
+storage/data/creations.json
+
+# AI Models cache
+.cache/
+models/
+
+# Logs
+*.log
+logs/

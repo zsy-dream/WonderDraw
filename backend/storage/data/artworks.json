@@ -1,0 +1,11 @@
+{
+  "artworks": [
+    {
+      "id": "ab19dc1d-f24c-4788-9887-f0ba072507f6",
+      "user_id": "bd1759eb-e38d-426d-956e-1b6eb60755b2",
+      "filename": "20260222_165438_watermarked.jpg",
+      "file_path": "http://localhost:5001/storage/images/original/ab19dc1d-f24c-4788-9887-f0ba072507f6_20260222_165438_watermarked.jpg",
+      "created_at": "2026-02-27T21:00:29.022323"
+    }
+  ]
+}

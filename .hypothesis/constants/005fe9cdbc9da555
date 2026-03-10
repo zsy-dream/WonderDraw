@@ -1,0 +1,4 @@
+# file: D:\互联网+项目开发\06童话\backend\services\artwork_service.py
+# hypothesis_version: 6.151.6
+
+[255, 1024, 2048, '.', 'RGB', 'RGBA', 'artworks', 'filename', 'id', 'jpeg', 'jpg', 'original_path', 'png', 'uploaded_at', 'user_id', 'webp', '文件为空', '未选择文件']

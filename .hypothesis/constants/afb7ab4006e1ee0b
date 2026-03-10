@@ -1,0 +1,4 @@
+# file: D:\互联网+项目开发\06童话\backend\models\controlnet_processor.py
+# hypothesis_version: 6.151.6
+
+[1.0, 7.5, 512, 'RGB', 'cpu', 'cuda', '模型加载成功', '模型已卸载', '模型未加载，请先初始化处理器']

@@ -1,0 +1,4 @@
+# file: D:\互联网+项目开发\06童话\backend\models\llm_processor.py
+# hypothesis_version: 6.151.6
+
+[0.8, 100, 300, 500, '"', "'", '...', 'API 请求超时', 'Authorization', 'Content-Type', 'LLM API URL 不能为空', 'LLM API 密钥未设置', '\\s+', 'application/json', 'choices', 'content', 'deepseek', 'deepseek-chat', 'max_tokens', 'message', 'messages', 'model', 'qwen', 'qwen-turbo', 'role', 'system', 'temperature', 'user', '。', '伤心', '刀', '可怕', '哭泣', '妖怪', '害怕', '怪物', '恐怖', '悲伤', '战争', '打', '故事内容未通过安全检查，重新生成', '故事生成失败，已达到最大重试次数', '故事：', '暴力', '杀', '枪', '标题：', '武器', '死亡', '炸', '爆', '生成的故事为空', '痛苦', '血', '邪恶', '难过', '鬼', '魔鬼', '黑暗', '：']

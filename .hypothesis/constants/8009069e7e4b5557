@@ -1,0 +1,4 @@
+# file: D:\互联网+项目开发\06童话\backend\models\svd_processor.py
+# hypothesis_version: 6.151.6
+
+[0.02, 100, 127, 300, 576, 1024, '+faststart', '-c:v', '-crf', '-i', '-movflags', '-preset', '-version', '-y', '23', 'RGB', 'SVD 模型加载成功', 'SVD 模型已卸载', 'cpu', 'cuda', 'ffmpeg', 'ffmpeg 不可用，跳过视频压缩', 'fp16', 'libx264', 'medium', '压缩后文件更大，保留原始文件', '开始压缩视频...', '模型未加载，请先初始化处理器', '视频压缩超时，使用原始文件', '调用 SVD 生成视频帧...']
