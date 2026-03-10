@@ -120,7 +120,7 @@ function CooperationProgressFAQ() {
             </li>
             <li className="flex gap-2">
               <span className="text-green-500">✓</span>
-              <span>专属客服，技术支持响应时间 <24h</span>
+              <span>专属客服，技术支持响应时间 {'<'}24h</span>
             </li>
           </ul>
           <p className="text-xs text-gray-500 mt-3">
