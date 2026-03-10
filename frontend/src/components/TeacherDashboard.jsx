@@ -222,7 +222,7 @@ function TeacherDashboard({ classData }) {
               <p className="text-xs mt-1 opacity-70">长按作品卡片可查看投稿详情</p>
             </div>
           </motion.div>
-12>        )}
+        )}
 
         {activeTab === 'analytics' && (
           <motion.div
