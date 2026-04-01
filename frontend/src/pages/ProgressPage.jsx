@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { userAPI } from '../services/api';
 import { useUser } from '../contexts/UserContext';
 import { useDemo } from '../contexts/DemoContext';
+import { getMockUserProgress } from '../utils/mockData';
 import AbilityRadarChart from '../components/AbilityRadarChart';
 import CreationTimeline from '../components/CreationTimeline';
 
@@ -62,11 +63,15 @@ function ProgressPage() {
       if (response.success) {
         setProgressData(response.data);
       } else {
-        setError('加载成长档案失败');
+        // 如果 API 失败，使用本地 mock 数据兜底（演示模式）
+        const { getMockUserProgress } = await import('../utils/mockData');
+        setProgressData(getMockUserProgress(userId));
       }
     } catch (err) {
       console.error('加载成长档案失败:', err);
-      setError('加载失败，请稍后重试');
+      // 使用本地 mock 数据兜底（演示模式）
+      const { getMockUserProgress } = await import('../utils/mockData');
+      setProgressData(getMockUserProgress(userId));
     } finally {
       setIsLoading(false);
     }

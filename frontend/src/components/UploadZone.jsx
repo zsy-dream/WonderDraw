@@ -2,10 +2,11 @@ import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { validateImageFile } from '../utils/helpers';
 import { UPLOAD_CONFIG, ERROR_MESSAGES } from '../utils/constants';
+import { demoSampleImages } from '../utils/mockData';
 
 /**
  * 上传区域组件
- * 支持拖放和点击上传
+ * 支持拖放、点击上传，以及快速演示模式
  */
 function UploadZone({ onFileSelect, disabled = false }) {
   const [isDragging, setIsDragging] = useState(false);
@@ -86,6 +87,41 @@ function UploadZone({ onFileSelect, disabled = false }) {
     setError(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
+    }
+  };
+
+  /**
+   * 选择示例图片（演示模式）
+   * 从URL获取图片并转换为File对象进行模拟上传
+   */
+  const handleDemoImageSelect = async (imageInfo) => {
+    try {
+      setIsUploading(true);
+      setError(null);
+
+      // 设置预览
+      setPreview(imageInfo.url);
+
+      // 获取图片Blob
+      const response = await fetch(imageInfo.url);
+      const blob = await response.blob();
+
+      // 创建File对象
+      const file = new File([blob], `${imageInfo.id}.jpg`, {
+        type: blob.type || 'image/jpeg',
+        lastModified: Date.now()
+      });
+
+      // 回调处理文件上传
+      if (onFileSelect) {
+        await onFileSelect(file);
+      }
+    } catch (err) {
+      console.error('Demo image select error:', err);
+      setError('演示图片加载失败，请检查网络连接');
+      setPreview(null);
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -190,6 +226,54 @@ function UploadZone({ onFileSelect, disabled = false }) {
                       delay: i * 0.2,
                     }}
                   />
+                ))}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* 快速演示区域 - 无需上传的示例图片 */}
+        <AnimatePresence>
+          {!preview && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="mt-6 pt-6 border-t-2 border-dashed border-gray-300"
+            >
+              <p className="text-sm text-gray-600 mb-3 flex items-center gap-2 font-medium">
+                <span>⚡</span>
+                <span>快速演示（点击示例图直接开始，无需上传文件）</span>
+              </p>
+              <div className="grid grid-cols-4 gap-3">
+                {demoSampleImages.map((image) => (
+                  <motion.button
+                    key={image.id}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDemoImageSelect(image);
+                    }}
+                    disabled={disabled}
+                    whileHover={!disabled ? { scale: 1.05 } : {}}
+                    whileTap={!disabled ? { scale: 0.95 } : {}}
+                    className={`relative group overflow-hidden rounded-xl border-2 transition-colors bg-gray-50 ${
+                      disabled 
+                        ? 'border-gray-200 opacity-50 cursor-not-allowed' 
+                        : 'border-gray-300 hover:border-blue-400 cursor-pointer'
+                    }`}
+                  >
+                    <img
+                      src={image.thumbnail}
+                      alt={image.name}
+                      className="w-full h-20 object-cover"
+                      loading="lazy"
+                    />
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center">
+                      <span className="text-white text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity text-center px-1 drop-shadow">
+                        {image.name}
+                      </span>
+                    </div>
+                  </motion.button>
                 ))}
               </div>
             </motion.div>
