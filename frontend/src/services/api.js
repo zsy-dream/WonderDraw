@@ -34,6 +34,27 @@ const demoOk = async (data, delayMs = 350) => {
 
 const demoId = (prefix) => `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 
+const demoTemplateByArtworkId = new Map();
+const demoOriginalByArtworkId = new Map();
+const demoTemplateByCreationId = new Map();
+const demoOriginalByCreationId = new Map();
+
+const demoPickAnimation = (templateId) => {
+  if (templateId === 'demo_flower_garden') return 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4';
+  if (templateId === 'demo_space_rocket') return 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4';
+  if (templateId === 'demo_sky_castle') return 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4';
+  if (templateId === 'demo_cat_adventure') return null;
+  return mockCreations[0]?.animation || null;
+};
+
+const demoPickStoryText = (templateId) => {
+  if (templateId === 'demo_cat_adventure') return '小猫背上小背包，沿着彩色小路出发，去寻找会说话的风铃。';
+  if (templateId === 'demo_space_rocket') return '火箭点亮星光，带着你穿过云层，去拜访一颗会唱歌的星球。';
+  if (templateId === 'demo_sky_castle') return '天空城堡的门只对勇敢的孩子打开，钥匙藏在彩虹尽头。';
+  if (templateId === 'demo_flower_garden') return '花园里的每朵花都是一个小精灵，它们用颜色讲故事。';
+  return mockCreations[0]?.story || '这是一个关于勇气与想象力的故事。';
+};
+
 const demoObjectUrlFromFile = (file) => {
   try {
     if (typeof window !== 'undefined' && window.URL && file instanceof File) {
@@ -90,13 +111,18 @@ export const userAPI = {
 export const artworkAPI = {
   uploadArtwork: (file, userId) => {
     if (isDemoMode) {
+      const templateId = file?.__demoTemplateId || null;
       const objectUrl = demoObjectUrlFromFile(file);
       const fallback = mockCreations[0]?.original_image;
+      const artworkId = demoId('demo_artwork');
+      demoTemplateByArtworkId.set(artworkId, templateId);
+      demoOriginalByArtworkId.set(artworkId, objectUrl || fallback);
       return demoOk({
-        id: demoId('demo_artwork'),
+        id: artworkId,
         user_id: userId,
         file_path: objectUrl || fallback,
         original_filename: file?.name || 'demo.png',
+        template_id: templateId,
         created_at: new Date().toISOString()
       }, 600);
     }
@@ -114,14 +140,17 @@ export const artworkAPI = {
 export const aiAPI = {
   enhanceImage: async (artworkId, creationId) => {
     if (isDemoMode) {
-      const enhanced = mockCreations[0]?.enhanced_image;
+      const templateId = demoTemplateByCreationId.get(creationId) || demoTemplateByArtworkId.get(artworkId) || null;
+      const original = demoOriginalByCreationId.get(creationId) || demoOriginalByArtworkId.get(artworkId) || null;
+      const enhanced = original || mockCreations[0]?.enhanced_image;
       return demoOk({ enhanced_image: enhanced, creation_id: creationId, artwork_id: artworkId }, 900);
     }
     return apiClient.post(`/artworks/${artworkId}/enhance`, { creation_id: creationId });
   },
   generateAnimation: async (artworkId, creationId, enhancedImage) => {
     if (isDemoMode) {
-      const animation = mockCreations[0]?.animation;
+      const templateId = demoTemplateByCreationId.get(creationId) || demoTemplateByArtworkId.get(artworkId) || null;
+      const animation = demoPickAnimation(templateId);
       return demoOk({
         animation,
         enhanced_image: enhancedImage || mockCreations[0]?.enhanced_image,
@@ -136,11 +165,50 @@ export const aiAPI = {
   },
   generateStory: async (artworkId, creationId, selectedChoice = null) => {
     if (isDemoMode) {
-      const detail = getMockCreationDetail('demo_creation_001');
-      const interactive = detail?.interactive_story || null;
+      const templateId = demoTemplateByCreationId.get(creationId) || demoTemplateByArtworkId.get(artworkId) || null;
+      const storyText = demoPickStoryText(templateId);
+
+      const interactive = {
+        root: {
+          text: templateId === 'demo_cat_adventure'
+            ? '小猫听到风铃在呼唤，你想先去哪里找线索？'
+            : templateId === 'demo_space_rocket'
+              ? '火箭准备起飞，你想先带上什么？'
+              : templateId === 'demo_sky_castle'
+                ? '天空城堡出现了，你会怎样靠近它？'
+                : templateId === 'demo_flower_garden'
+                  ? '花精灵邀请你做客，你想先看哪朵花？'
+                  : '你想让故事怎么开始？',
+          choices: templateId === 'demo_cat_adventure'
+            ? [
+                { id: 'smell', text: '跟着气味走' },
+                { id: 'ask', text: '问问路边的小鸟' },
+                { id: 'map', text: '画一张探险地图' }
+              ]
+            : templateId === 'demo_space_rocket'
+              ? [
+                  { id: 'snacks', text: '带上星星饼干' },
+                  { id: 'telescope', text: '带上望远镜' },
+                  { id: 'robot', text: '带上小机器人' }
+                ]
+              : templateId === 'demo_sky_castle'
+                ? [
+                    { id: 'balloon', text: '坐热气球上去' },
+                    { id: 'stairs', text: '寻找云梯' },
+                    { id: 'kite', text: '放一只会飞的风筝' }
+                  ]
+                : templateId === 'demo_flower_garden'
+                  ? [
+                      { id: 'sun', text: '金色向日葵' },
+                      { id: 'rose', text: '红色玫瑰' },
+                      { id: 'blue', text: '蓝色小花' }
+                    ]
+                  : []
+        }
+      };
 
       if (!interactive) {
-        return demoOk({ story: mockCreations[0]?.story, full_story: detail?.full_story || mockCreations[0]?.story }, 900);
+        return demoOk({ story: storyText, full_story: storyText }, 900);
       }
 
       const rootNode = 'root';
@@ -149,8 +217,8 @@ export const aiAPI = {
       const story_path = selectedChoice ? [rootNode, selectedChoice] : [rootNode];
 
       return demoOk({
-        story: node?.text || mockCreations[0]?.story,
-        full_story: detail?.full_story || mockCreations[0]?.story,
+        story: node?.text || storyText,
+        full_story: storyText,
         interactive_story: interactive,
         current_node: currentNode,
         story_path,
@@ -190,6 +258,9 @@ export const creationAPI = {
   createCreation: async (artworkId, userId, originalImage) => {
     if (isDemoMode) {
       const id = demoId('demo_creation');
+      const templateId = demoTemplateByArtworkId.get(artworkId) || null;
+      demoTemplateByCreationId.set(id, templateId);
+      demoOriginalByCreationId.set(id, originalImage || demoOriginalByArtworkId.get(artworkId) || null);
       return demoOk({
         id,
         artwork_id: artworkId,

@@ -38,7 +38,66 @@ function WorkspacePage() {
 
   const startLocalDemoFlow = async (file) => {
     const demoCreationId = `local_demo_${Date.now()}`;
+    const demoTemplateId = file?.__demoTemplateId || null;
     const template = getMockCreationDetail('demo_creation_001');
+
+    const pickAnimation = (tid) => {
+      if (tid === 'demo_flower_garden') return 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4';
+      if (tid === 'demo_space_rocket') return 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4';
+      if (tid === 'demo_sky_castle') return 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4';
+      if (tid === 'demo_cat_adventure') return null;
+      return template?.animation || null;
+    };
+
+    const pickStory = (tid) => {
+      if (tid === 'demo_cat_adventure') return '小猫背上小背包，沿着彩色小路出发，去寻找会说话的风铃。';
+      if (tid === 'demo_space_rocket') return '火箭点亮星光，带着你穿过云层，去拜访一颗会唱歌的星球。';
+      if (tid === 'demo_sky_castle') return '天空城堡的门只对勇敢的孩子打开，钥匙藏在彩虹尽头。';
+      if (tid === 'demo_flower_garden') return '花园里的每朵花都是一个小精灵，它们用颜色讲故事。';
+      return template?.story || '这是一个关于勇气与想象力的故事。';
+    };
+
+    const pickInteractive = (tid) => {
+      const rootText = tid === 'demo_cat_adventure'
+        ? '小猫听到风铃在呼唤，你想先去哪里找线索？'
+        : tid === 'demo_space_rocket'
+          ? '火箭准备起飞，你想先带上什么？'
+          : tid === 'demo_sky_castle'
+            ? '天空城堡出现了，你会怎样靠近它？'
+            : tid === 'demo_flower_garden'
+              ? '花精灵邀请你做客，你想先看哪朵花？'
+              : (template?.interactive_story?.root?.text || '你想让故事怎么开始？');
+
+      const choices = tid === 'demo_cat_adventure'
+        ? [
+            { id: 'smell', text: '跟着气味走' },
+            { id: 'ask', text: '问问路边的小鸟' },
+            { id: 'map', text: '画一张探险地图' }
+          ]
+        : tid === 'demo_space_rocket'
+          ? [
+              { id: 'snacks', text: '带上星星饼干' },
+              { id: 'telescope', text: '带上望远镜' },
+              { id: 'robot', text: '带上小机器人' }
+            ]
+          : tid === 'demo_sky_castle'
+            ? [
+                { id: 'balloon', text: '坐热气球上去' },
+                { id: 'stairs', text: '寻找云梯' },
+                { id: 'kite', text: '放一只会飞的风筝' }
+              ]
+            : tid === 'demo_flower_garden'
+              ? [
+                  { id: 'sun', text: '金色向日葵' },
+                  { id: 'rose', text: '红色玫瑰' },
+                  { id: 'blue', text: '蓝色小花' }
+                ]
+              : (template?.interactive_story?.root?.choices || []);
+
+      return {
+        root: { text: rootText, choices },
+      };
+    };
 
     setError(null);
     setCreationStatus(CREATION_STATUS.PROCESSING);
@@ -59,11 +118,11 @@ function WorkspacePage() {
       id: demoCreationId,
       artwork_id: `local_artwork_${Date.now()}`,
       original_image: dataUrl,
-      enhanced_image: template?.enhanced_image || dataUrl,
-      animation: template?.animation || null,
-      story: template?.story || '这是一个关于勇气与想象力的故事。',
-      full_story: template?.full_story || template?.story || '这是一个关于勇气与想象力的故事。',
-      interactive_story: template?.interactive_story || null,
+      enhanced_image: dataUrl,
+      animation: pickAnimation(demoTemplateId),
+      story: pickStory(demoTemplateId),
+      full_story: pickStory(demoTemplateId),
+      interactive_story: pickInteractive(demoTemplateId),
       current_node: 'root',
       story_path: ['root'],
       created_at: new Date().toISOString()

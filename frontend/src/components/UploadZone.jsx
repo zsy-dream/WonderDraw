@@ -112,6 +112,12 @@ function UploadZone({ onFileSelect, disabled = false }) {
         lastModified: Date.now()
       });
 
+      try {
+        file.__demoTemplateId = imageInfo.id;
+      } catch (_) {
+        // ignore
+      }
+
       // 回调处理文件上传
       if (onFileSelect) {
         await onFileSelect(file);
