@@ -1,5 +1,6 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { mockSubmissionHistory, mockSubmissionPublishers } from '../utils/mockData';
 
 /**
  * 出版投稿组件
@@ -19,61 +20,8 @@ function PublisherSubmission({ creation, onSubmitted }) {
     description: ''
   });
 
-  // 模拟合作出版社
-  const publishers = [
-    {
-      id: 'publisher_1',
-      name: '童趣出版社',
-      type: '绘本',
-      description: '专注3-12岁儿童原创绘本出版',
-      logo: '📚',
-      acceptance: '高',
-      territory: '全国',
-      revenue: '35%分成'
-    },
-    {
-      id: 'publisher_2',
-      name: '快乐童书',
-      type: '故事集',
-      description: '优质儿童故事合集投稿通道',
-      logo: '🏫',
-      acceptance: '中',
-      territory: '海外',
-      revenue: '30%分成'
-    },
-    {
-      id: 'publisher_3',
-      name: '星辰工作室',
-      type: '动画',
-      description: '儿童动画短片改编制作',
-      logo: '🎬',
-      acceptance: '低',
-      territory: '全球',
-      revenue: '25%分成'
-    }
-  ];
-
-  // 模拟投稿历史
-  const mockSubmissions = [
-    {
-      id: 'sub_1',
-      title: '小兔子的冒险之旅',
-      publisher: '童趣出版社',
-      status: 'review',
-      label: '审核中',
-      date: '2026-03-08',
-      icon: '⏳'
-    },
-    {
-      id: 'sub_2',
-      title: '彩虹桥的秘密',
-      publisher: '快乐童书',
-      status: 'accepted',
-      label: '已录用',
-      date: '2026-02-25',
-      icon: '✅'
-    }
-  ];
+  const publishers = mockSubmissionPublishers;
+  const mockSubmissions = mockSubmissionHistory;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -86,7 +34,7 @@ function PublisherSubmission({ creation, onSubmitted }) {
       success: true,
       submissionId: `SUB_${Date.now()}`,
       publisher: selectedPublisher.name,
-      estimatedReviewDays: 7
+      estimatedReviewDays: selectedPublisher.reviewCycle
     });
 
     setIsSubmitting(false);
@@ -137,7 +85,9 @@ function PublisherSubmission({ creation, onSubmitted }) {
                   className={`p-3 rounded-lg border ${
                     sub.status === 'accepted'
                       ? 'bg-green-50 border-green-200'
-                      : 'bg-amber-50 border-amber-200'
+                      : sub.status === 'production'
+                        ? 'bg-blue-50 border-blue-200'
+                        : 'bg-amber-50 border-amber-200'
                   }`}
                 >
                   <div className="flex items-center justify-between">
@@ -146,12 +96,15 @@ function PublisherSubmission({ creation, onSubmitted }) {
                       <div>
                         <p className="font-medium text-gray-800">{sub.title}</p>
                         <p className="text-xs text-gray-500">{sub.publisher} • {sub.date}</p>
+                        <p className="text-xs text-gray-500 mt-1">{sub.note}</p>
                       </div>
                     </div>
                     <span className={`text-xs px-2 py-1 rounded-full font-medium ${
                       sub.status === 'accepted'
                         ? 'bg-green-600 text-white'
-                        : 'bg-amber-200 text-amber-800'
+                        : sub.status === 'production'
+                          ? 'bg-blue-600 text-white'
+                          : 'bg-amber-200 text-amber-800'
                     }`}>
                       {sub.label}
                     </span>
@@ -215,8 +168,8 @@ function PublisherSubmission({ creation, onSubmitted }) {
                 <div className="text-6xl mb-4">🎉</div>
                 <h4 className="text-2xl font-bold text-green-800 mb-2">投稿成功！</h4>
                 <p className="text-gray-600 text-center mb-6">
-                  您的作品已提交给 <strong>{submissionStatus.publisher}</strong><br/>
-                  预计审核周期：<span className="font-bold text-indigo-600">{submissionStatus.estimatedReviewDays}个工作日</span>
+                  《{creation?.story ? '当前创作作品' : creation?.id ? `作品 ${creation.id.slice(0, 8)}` : '当前作品'}》已提交给 <strong>{submissionStatus.publisher}</strong><br/>
+                  预计审核周期：<span className="font-bold text-indigo-600">{submissionStatus.estimatedReviewDays}</span>
                 </p>
                 <div className="space-y-3 w-full max-w-sm">
                   <div className="bg-gray-100 rounded-lg p-4 text-center">
@@ -263,9 +216,10 @@ function PublisherSubmission({ creation, onSubmitted }) {
                               </div>
                               <p className="text-sm text-gray-600">{pub.description}</p>
                               <div className="flex gap-4 mt-2">
-                                <span className="text-xs text-gray-500">📊 录用率: {pub.acceptance}</span>
+                                <span className="text-xs text-gray-500">📊 录用评级: {pub.acceptance}</span>
                                 <span className="text-xs text-gray-500">🌍 {pub.territory}</span>
                                 <span className="text-xs font-bold text-indigo-600">{pub.revenue}</span>
+                                <span className="text-xs text-gray-500">⏱ {pub.reviewCycle}</span>
                               </div>
                             </div>
                           </div>
@@ -281,7 +235,7 @@ function PublisherSubmission({ creation, onSubmitted }) {
                         <span className="text-2xl">{selectedPublisher.logo}</span>
                         <div>
                           <h4 className="font-bold text-indigo-900">{selectedPublisher.name}</h4>
-                          <p className="text-xs text-indigo-700">录用后将获得 {selectedPublisher.revenue}</p>
+                          <p className="text-xs text-indigo-700">录用后将获得 {selectedPublisher.revenue}，预计审核 {selectedPublisher.reviewCycle}</p>
                         </div>
                       </div>
                     </div>

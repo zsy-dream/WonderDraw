@@ -1,74 +1,16 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { mockPublishedWorks } from '../utils/mockData';
 
 /**
  * 已录用作品展示组件
  * 展示已被出版社录用的优秀作品案例
  */
 function PublishedWorksShowcase() {
-  // 模拟已录用作品数据
-  const publishedWorks = [
-    {
-      id: 'work_1',
-      title: '彩虹桥的秘密',
-      author: '李小明（8岁）',
-      school: '阳光小学',
-      publisher: '快乐童书',
-      publishDate: '2026-01-15',
-      coverImage: '🌈',
-      category: '绘本',
-      status: 'published',
-      sales: '5,000册',
-      revenue: '¥12,500',
-      rating: '4.8',
-      story: '这是一个关于勇气和友谊的冒险故事...'
-    },
-    {
-      id: 'work_2',
-      title: '小兔子的冒险之旅',
-      author: '张欣欣（9岁）',
-      school: '星辰国际学校',
-      publisher: '童趣出版社',
-      publishDate: '2026-02-20',
-      coverImage: '🐰',
-      category: '绘本',
-      status: 'published',
-      sales: '3,200册',
-      revenue: '¥9,600',
-      rating: '4.7',
-      story: '一只勇敢的小兔子踏上了寻找彩虹的旅程...'
-    },
-    {
-      id: 'work_3',
-      title: '海底奇遇记',
-      author: '王乐乐（7岁）',
-      school: '阳光小学',
-      publisher: '星辰工作室',
-      publishDate: '2026-03-01',
-      coverImage: '🐠',
-      category: '动画',
-      status: 'production',
-      sales: '-',
-      revenue: '预计 ¥20,000',
-      rating: '-',
-      story: '小鱼在大海中遇见了许多新朋友...'
-    },
-    {
-      id: 'work_4',
-      title: '天空之城',
-      author: '陈思思（10岁）',
-      school: '星辰国际学校',
-      publisher: '童趣出版社',
-      publishDate: '2026-02-28',
-      coverImage: '🏰',
-      category: '绘本',
-      status: 'review',
-      sales: '-',
-      revenue: '待定',
-      rating: '-',
-      story: '一个关于梦想和探索的故事...'
-    }
-  ];
+  const publishedWorks = mockPublishedWorks;
+  const totalRevenue = publishedWorks
+    .filter((work) => work.status === 'published')
+    .reduce((sum, work) => sum + Number((work.revenue || '').replace(/[^\d.]/g, '')), 0);
 
   const getStatusBadge = (status) => {
     const statusMap = {
@@ -107,7 +49,7 @@ function PublishedWorksShowcase() {
         </div>
         <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-4 text-center border border-purple-200">
           <div className="text-3xl mb-2">💰</div>
-          <div className="text-2xl font-bold text-purple-700">¥22,100</div>
+          <div className="text-2xl font-bold text-purple-700">¥{totalRevenue.toLocaleString()}</div>
           <div className="text-sm text-purple-600">已发放收益</div>
         </div>
       </div>
@@ -147,6 +89,13 @@ function PublishedWorksShowcase() {
                   </div>
 
                   <p className="text-sm text-gray-600 mb-3 line-clamp-2">{work.story}</p>
+                  <div className="flex flex-wrap gap-2 mb-3">
+                    {work.tags?.map((tag) => (
+                      <span key={tag} className="text-xs bg-indigo-50 text-indigo-700 px-2 py-1 rounded-full">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
 
                   <div className="flex flex-wrap gap-4 text-sm">
                     <div>
@@ -212,7 +161,7 @@ function PublishedWorksShowcase() {
           </div>
         </div>
         <p className="text-xs text-indigo-600 mt-3">
-          当前平台已累计帮助 4 位小作者的 4 部作品成功录用，发放收益 ¥22,100 元
+          当前演示数据已累计展示 {publishedWorks.length} 部代表作品，其中 {publishedWorks.filter(w => w.status === 'published').length} 部已进入出版阶段。
         </p>
       </div>
     </div>

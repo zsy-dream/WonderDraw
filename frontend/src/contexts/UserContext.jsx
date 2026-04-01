@@ -32,9 +32,17 @@ export function UserProvider({ children }) {
       const sessionData = localStorage.getItem(SESSION_KEY);
       if (sessionData) {
         const session = JSON.parse(sessionData);
-        const user = await localDB.getUser(session.userId);
-        
-        if (user && session.sessionToken === user.sessionToken) {
+
+        // 先按 userId 查找；如果 userId 因后端同步变化导致查不到，则用 email 兜底
+        let user = null;
+        if (session.userId) {
+          user = await localDB.getUser(session.userId);
+        }
+        if (!user && session.email) {
+          user = await localDB.getUserByEmail(session.email);
+        }
+
+        if (user && session.sessionToken && session.sessionToken === user.sessionToken) {
           setCurrentUser(user);
           // 更新最后登录时间
           await localDB.saveUser({
@@ -104,6 +112,8 @@ export function UserProvider({ children }) {
       // 设置会话
       const sessionData = {
         userId: userData.id,
+        email: userData.email,
+        nickname: userData.nickname,
         sessionToken: userData.sessionToken,
         loginTime: new Date().toISOString()
       };
@@ -155,6 +165,8 @@ export function UserProvider({ children }) {
       // 设置会话
       const sessionData = {
         userId: updatedUser.id,
+        email: updatedUser.email,
+        nickname: updatedUser.nickname,
         sessionToken: updatedUser.sessionToken,
         loginTime: new Date().toISOString()
       };

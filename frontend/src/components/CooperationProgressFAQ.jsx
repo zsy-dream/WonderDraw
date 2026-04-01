@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { mockFaq, mockPartnerTimeline } from '../utils/mockData';
 
 /**
  * 合作进展FAQ组件
@@ -7,6 +8,8 @@ import { motion, AnimatePresence } from 'framer-motion';
  */
 function CooperationProgressFAQ() {
   const [openItem, setOpenItem] = useState(null);
+  const revenueItems = mockFaq.revenueItems;
+  const schoolBenefits = mockFaq.schoolBenefits;
 
   const toggleItem = (id) => {
     setOpenItem(openItem === id ? null : id);
@@ -19,34 +22,15 @@ function CooperationProgressFAQ() {
       title: '合作进展时间线',
       content: (
         <div className="space-y-4">
-          <div className="flex gap-4">
-            <div className="flex-shrink-0 w-24 text-right text-sm text-gray-500">2026-01</div>
-            <div className="flex-1">
-              <p className="font-bold">与童趣出版社达成合作意向</p>
-              <p className="text-sm text-gray-600">签署初步合作协议，开放投稿通道</p>
+          {mockPartnerTimeline.map((item) => (
+            <div key={item.date + item.title} className="flex gap-4">
+              <div className="flex-shrink-0 w-24 text-right text-sm text-gray-500">{item.date}</div>
+              <div className="flex-1">
+                <p className="font-bold">{item.title}</p>
+                <p className="text-sm text-gray-600">{item.description}</p>
+              </div>
             </div>
-          </div>
-          <div className="flex gap-4">
-            <div className="flex-shrink-0 w-24 text-right text-sm text-gray-500">2026-02</div>
-            <div className="flex-1">
-              <p className="font-bold">阳光小学签约试点</p>
-              <p className="text-sm text-gray-600">3个班级试点应用，教师端功能交付</p>
-            </div>
-          </div>
-          <div className="flex gap-4">
-            <div className="flex-shrink-0 w-24 text-right text-sm text-gray-500">2026-03</div>
-            <div className="flex-1">
-              <p className="font-bold">首批作品成功投稿</p>
-              <p className="text-sm text-gray-600">《彩虹桥的秘密》等4部作品投稿成功</p>
-            </div>
-          </div>
-          <div className="flex gap-4">
-            <div className="flex-shrink-0 w-24 text-right text-sm text-gray-500">2026-Q2</div>
-            <div className="flex-1">
-              <p className="font-bold">星辰国际学校签约</p>
-              <p className="text-sm text-gray-600">5个班级覆盖，拓展市场份额</p>
-            </div>
-          </div>
+          ))}
         </div>
       )
     },
@@ -81,9 +65,9 @@ function CooperationProgressFAQ() {
           <div className="bg-green-50 rounded-lg p-4 border border-green-200">
             <p className="font-bold text-green-900 mb-2">收益构成</p>
             <ul className="text-sm space-y-1">
-              <li>• 图书出版：销售额的 25-35% 分成给创作者</li>
-              <li>• 动画改编：版权费的 20-30% 分成给创作者</li>
-              <li>• 付费简历：平台订阅费时的创作者补贴</li>
+              {revenueItems.map((item) => (
+                <li key={item}>• {item}</li>
+              ))}
             </ul>
           </div>
           <p className="text-sm text-gray-600">
@@ -102,26 +86,12 @@ function CooperationProgressFAQ() {
             学校订阅服务（¥3,000/年/班）包含：
           </p>
           <ul className="text-sm space-y-2">
-            <li className="flex gap-2">
-              <span className="text-green-500">✓</span>
-              <span>50 个学生账号，无限制作品创作</span>
-            </li>
-            <li className="flex gap-2">
-              <span className="text-green-500">✓</span>
-              <span>教师管理看板，班级数据分析</span>
-            </li>
-            <li className="flex gap-2">
-              <span className="text-green-500">✓</span>
-              <span>作品投稿通道，学生作品可投稿至合作出版社</span>
-            </li>
-            <li className="flex gap-2">
-              <span className="text-green-500">✓</span>
-              <span>AI 课程资源库，美育教案辅助工具</span>
-            </li>
-            <li className="flex gap-2">
-              <span className="text-green-500">✓</span>
-              <span>专属客服，技术支持响应时间 {'<'}24h</span>
-            </li>
+            {schoolBenefits.map((item) => (
+              <li key={item} className="flex gap-2">
+                <span className="text-green-500">✓</span>
+                <span>{item}</span>
+              </li>
+            ))}
           </ul>
           <p className="text-xs text-gray-500 mt-3">
             注：学生投稿成功后，收益由平台代管，按学期发放给学校，由学校转交给原作者及家长。

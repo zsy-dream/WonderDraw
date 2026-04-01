@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import BusinessModelHero from '../components/BusinessModelHero';
 import CooperationProgressFAQ from '../components/CooperationProgressFAQ';
 import AgreementModal from '../components/AgreementModal';
+import { mockFaqLanding } from '../utils/mockData';
 
 /**
  * FAQ页面
@@ -26,7 +27,7 @@ function FAQPage() {
             <h1 className="text-4xl font-bold mb-2" style={{ color: 'var(--color-primary)' }}>
               🤝 合作与FAQ
             </h1>
-            <p className="text-lg text-gray-600">了解我们的合作进展、商业模式和使用说明</p>
+            <p className="text-lg text-gray-600">{mockFaqLanding.subtitle}</p>
           </div>
           <button
             onClick={() => navigate('/')}
@@ -67,7 +68,7 @@ function FAQPage() {
                   <span>出版社合作意向书</span>
                 </h3>
                 <p className="text-gray-600 mb-6">
-                  可下载查看与合作出版社签署的意向协议书，作为项目合作佐证材料
+                  {mockFaqLanding.agreementDescription}
                 </p>
                 <motion.button
                   whileHover={{ scale: 1.02 }}
@@ -90,13 +91,14 @@ function FAQPage() {
               transition={{ delay: 0.6 }}
               className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl p-6 text-center border border-indigo-200"
             >
-              <h4 className="font-bold text-indigo-900 mb-2">📞 欢迎咨询合作</h4>
+              <h4 className="font-bold text-indigo-900 mb-2">{mockFaqLanding.contactTitle}</h4>
               <p className="text-sm text-indigo-700 mb-3">
-                如果您是出版社、学校、教育机构或有合作意向，欢迎联系我们
+                {mockFaqLanding.contactDescription}
               </p>
               <div className="flex justify-center gap-4 text-sm">
-                <span className="bg-white px-4 py-2 rounded-lg">📧 business@tonghuaiqijing.com</span>
-                <span className="bg-white px-4 py-2 rounded-lg">📱 400-888-8888</span>
+                {mockFaqLanding.contacts.map((contact) => (
+                  <span key={contact} className="bg-white px-4 py-2 rounded-lg">{contact}</span>
+                ))}
               </div>
             </motion.div>
           </motion.div>

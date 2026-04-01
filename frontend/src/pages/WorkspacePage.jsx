@@ -9,6 +9,7 @@ import { useUser } from '../contexts/UserContext';
 import { artworkAPI, creationAPI, aiAPI } from '../services/api';
 // imageProcessor/videoGenerator 已经迁移到后端 API
 import { CREATION_STEPS, CREATION_STATUS, ERROR_MESSAGES } from '../utils/constants';
+import { mockWorkspaceCopy, mockWorkspaceGuidanceTemplates } from '../utils/mockData';
 
 /**
  * 神笔工作台
@@ -184,37 +185,7 @@ function WorkspacePage() {
       
       // 使用模板引导
       if (!guidanceData) {
-        const templates = {
-          [CREATION_STEPS.ENHANCING]: {
-            title: "🎨 图片优化建议",
-            suggestions: [
-              "试着调整亮度让画面更明亮",
-              "增加对比度让细节更清晰",
-              "适当提高饱和度让色彩更鲜艳"
-            ],
-            encouragement: "你的画作很有潜力！让我们让它更加出色。"
-          },
-          [CREATION_STEPS.ANIMATING]: {
-            title: "🎬 动画创作思路",
-            suggestions: [
-              "考虑让画中的角色动起来",
-              "添加一些魔法特效会很棒",
-              "试试不同的动画风格"
-            ],
-            encouragement: "动画让静态的画作充满生命力！"
-          },
-          [CREATION_STEPS.STORY_GEN]: {
-            title: "📖 故事创作灵感",
-            suggestions: [
-              "画中的角色有什么特别的故事？",
-              "这个场景发生在什么地方？",
-              "接下来会发生什么奇妙的事情？"
-            ],
-            encouragement: "每个画作都藏着一个独特的故事，让我们一起发现它！"
-          }
-        };
-        
-        guidanceData = templates[creationStep] || templates[CREATION_STEPS.ENHANCING];
+        guidanceData = mockWorkspaceGuidanceTemplates[creationStep] || mockWorkspaceGuidanceTemplates[CREATION_STEPS.ENHANCING];
       }
       
       setGuidanceData(guidanceData);
@@ -259,12 +230,12 @@ function WorkspacePage() {
         <div className="container mx-auto flex items-center justify-between">
           <div>
             <h1 className="text-4xl font-bold mb-2" style={{ color: 'var(--color-primary)' }}>
-              神笔工作台 🎨
+              {mockWorkspaceCopy.title}
             </h1>
-            <p className="text-lg text-gray-600">让你的画作变成魔法</p>
+            <p className="text-lg text-gray-600">{mockWorkspaceCopy.subtitle}</p>
             {currentUser && (
               <p className="text-sm text-gray-500 mt-1">
-                欢迎回来，{currentUser.nickname}！
+                {mockWorkspaceCopy.welcomeBackPrefix}{currentUser.nickname}{mockWorkspaceCopy.welcomeBackSuffix}
               </p>
             )}
           </div>
@@ -278,7 +249,7 @@ function WorkspacePage() {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
-                查看作品
+                {mockWorkspaceCopy.viewResultButton}
               </motion.button>
             )}
             {(creationStep === CREATION_STEPS.FAILED || creationStep === CREATION_STEPS.COMPLETED) && (
@@ -290,14 +261,14 @@ function WorkspacePage() {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
-                重新创作
+                {mockWorkspaceCopy.restartButton}
               </motion.button>
             )}
             <button
               onClick={() => navigate('/')}
               className="clay-button px-6 py-3"
             >
-              返回画廊
+              {mockWorkspaceCopy.backButton}
             </button>
           </div>
         </div>
@@ -317,7 +288,7 @@ function WorkspacePage() {
                 className="clay-card mb-8"
               >
                 <h2 className="text-2xl font-bold mb-4" style={{ color: 'var(--color-secondary)' }}>
-                  上传你的画作
+                  {mockWorkspaceCopy.uploadSectionTitle}
                 </h2>
                 <UploadZone 
                   onFileSelect={handleFileUpload}
@@ -338,7 +309,7 @@ function WorkspacePage() {
                 className="clay-card"
               >
                 <h2 className="text-2xl font-bold mb-4" style={{ color: 'var(--color-accent)' }}>
-                  魔法进行中 ✨
+                  {mockWorkspaceCopy.processingTitle}
                 </h2>
                 <MagicEngine 
                   currentStep={creationStep}
@@ -365,7 +336,7 @@ function WorkspacePage() {
                 <div className="flex items-center gap-3">
                   <span className="text-2xl">❌</span>
                   <div>
-                    <h3 className="font-bold text-red-800">创作遇到问题</h3>
+                    <h3 className="font-bold text-red-800">{mockWorkspaceCopy.errorTitle}</h3>
                     <p className="text-red-600">{error}</p>
                   </div>
                 </div>
@@ -373,7 +344,7 @@ function WorkspacePage() {
                   onClick={handleRestart}
                   className="mt-4 clay-button px-4 py-2 bg-red-500 text-white"
                 >
-                  重新开始
+                  {mockWorkspaceCopy.restartInlineButton}
                 </button>
               </motion.div>
             )}

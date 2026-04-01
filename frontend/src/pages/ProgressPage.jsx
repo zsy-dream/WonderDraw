@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { userAPI } from '../services/api';
 import { useUser } from '../contexts/UserContext';
+import { useDemo } from '../contexts/DemoContext';
 import AbilityRadarChart from '../components/AbilityRadarChart';
 import CreationTimeline from '../components/CreationTimeline';
 
@@ -14,9 +15,12 @@ function ProgressPage() {
   const { userId: paramUserId } = useParams();
   const navigate = useNavigate();
   const { currentUser } = useUser();
+  const { state: demoState } = useDemo();
   const [progressData, setProgressData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const forced = demoState?.enabled ? demoState?.forced?.progress : 'normal';
 
   // 优先使用 URL 参数中的 userId，否则使用当前登录用户
   const userId = paramUserId || currentUser?.id;
@@ -34,6 +38,24 @@ function ProgressPage() {
     try {
       setIsLoading(true);
       setError(null);
+
+      if (forced === 'loading') {
+        return;
+      }
+      if (forced === 'error') {
+        setError('加载成长档案失败');
+        setProgressData(null);
+        return;
+      }
+      if (forced === 'empty') {
+        setProgressData({
+          summary: { total_creations: 0, creation_span_days: 0 },
+          ability_scores: {},
+          timeline: [],
+          insights: []
+        });
+        return;
+      }
       
       const response = await userAPI.getUserProgress(userId);
       

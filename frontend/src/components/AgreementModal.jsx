@@ -1,51 +1,14 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { mockAgreementContent, mockAgreements } from '../utils/mockData';
 
 /**
  * 意向书展示浮层
  * 用于展示与合作出版社的意向协议书扫描件
  */
 function AgreementModal({ isOpen, onClose }) {
-  const [activeTab, setActiveTab] = useState('tongqu');
-
-  const agreements = [
-    {
-      id: 'tongqu',
-      title: '童趣出版社合作意向书',
-      date: '2026-01-15',
-      publisher: '童趣出版社',
-      status: '已签署',
-      contact: '签约编辑: 张老师',
-      file: 'tongqu_agreement.pdf',
-      thumbnail: '📄',
-      previewText: '甲方：童趣出版社\n乙方：童画·奇境团队\n\n一、合作内容\n1. 乙方将优质儿童原创作品投稿至甲方\n2. 甲方负责作品编辑、出版、发行\n3. 作品发行后，乙方获得销售额25%分成\n\n二、合作期限\n本意向书自签署之日起有效期为2年\n\n...',
-      code: 'AGR-THQ-2026-001'
-    },
-    {
-      id: 'kuaile',
-      title: '快乐童书合作意向书',
-      date: '2026-02-10',
-      publisher: '快乐童书',
-      status: '洽谈中',
-      contact: '对接人: 李经理',
-      file: 'kuaile_agreement.pdf',
-      thumbnail: '📄',
-      previewText: '甲方：快乐童书\n乙方：童画·奇境团队\n\n合作条款草案\n\n一、合作意向\n针对儿童故事合集出版建立合作关系\n\n二、分成比例\n作品录用后，乙方获得30%收益分成\n\n（注：以下条款正在商务洽谈中）',
-      code: 'AGR-KL-2026-002'
-    },
-    {
-      id: 'xingchen',
-      title: '星辰工作室合作意向书',
-      date: '2026-03-01',
-      publisher: '星辰工作室',
-      status: '签约中',
-      contact: '对接人: 王导演',
-      file: 'xingchen_agreement.pdf',
-      thumbnail: '🎬',
-      previewText: '甲方：星辰工作室\n乙方：童画·奇境团队\n\n动画改编合作意向书\n\n一、作品类型\n儿童动画短片改编\n\n二、授权范围\n乙方授权甲方将作品改编为动画\n\n（注：合同条款审核中）',
-      code: 'AGR-XC-2026-003'
-    }
-  ];
+  const agreements = mockAgreements;
+  const [activeTab, setActiveTab] = useState(mockAgreements[0]?.id || 'tongqu');
 
   const handleDownload = (agreement) => {
     // 创建一个虚拟的下载链接
@@ -93,7 +56,7 @@ function AgreementModal({ isOpen, onClose }) {
                 <div>
                   <h2 className="text-xl font-bold text-gray-800">出版社合作意向书</h2>
                   <p className="text-sm text-gray-500">
-                    可下载查看与 {agreements.length} 家出版社的意向协议书
+                    {mockAgreementContent.headerText.replace('{count}', agreements.length)}
                   </p>
                 </div>
               </div>
@@ -187,7 +150,7 @@ function AgreementModal({ isOpen, onClose }) {
                         </p>
                         <div className="bg-white p-6 rounded-lg shadow max-w-lg mx-auto text-left">
                           <p className="text-sm font-bold text-gray-700 mb-2">
-                            保密协议 · 仅供内部评审使用
+                            {mockAgreementContent.previewBadge}
                           </p>
                           <div className="text-sm text-gray-600 whitespace-pre-line">
                             {activeAgreement.previewText}
@@ -219,9 +182,7 @@ function AgreementModal({ isOpen, onClose }) {
                     <div className="bg-amber-50 rounded-xl p-4 border border-amber-200">
                       <p className="text-sm text-amber-900">
                         <span className="font-bold">💡 说明：</span>
-                        以上意向协议书为与合作出版社签署的真实文件（或扫描件）。
-                        旨在展示项目已获得出版社合作支持，为答辩提供佐证材料。
-                        协议条款可根据实际商务洽谈情况调整。
+                        {mockAgreementContent.disclaimer}
                       </p>
                     </div>
                   </div>

@@ -1,10 +1,12 @@
 """AI 服务 - 协调各种 AI 模型的工作流"""
 import logging
+import os
 from typing import Dict, Optional
 from backend.models.controlnet_processor import ControlNetProcessor
 from backend.models.svd_processor import SVDProcessor
 from backend.models.llm_processor import LLMProcessor
 from backend.services.creation_service import CreationService
+from backend.config import Config
 
 logger = logging.getLogger(__name__)
 
@@ -34,7 +36,15 @@ class AIService:
             logger.info("正在加载 AI 模型...")
             self.controlnet_processor = ControlNetProcessor()
             self.svd_processor = SVDProcessor()
-            self.llm_processor = LLMProcessor()
+            # 使用配置初始化 LLMProcessor
+            self.llm_processor = LLMProcessor(
+                api_key=Config.LLM_API_KEY or os.environ.get('LLM_API_KEY', ''),
+                api_url=Config.LLM_API_URL or os.environ.get('LLM_API_URL', 'https://api.modelarts-maas.com/v2/chat/completions'),
+                provider=Config.LLM_PROVIDER or os.environ.get('LLM_PROVIDER', 'deepseek'),
+                max_tokens=getattr(Config, 'LLM_MAX_TOKENS', 500),
+                temperature=getattr(Config, 'LLM_TEMPERATURE', 0.8),
+                model_name=getattr(Config, 'LLM_MODEL_NAME', None) or os.environ.get('LLM_MODEL_NAME', 'deepseek-v3.2')
+            )
             self._models_loaded = True
             logger.info("AI 模型加载完成")
         except Exception as e:

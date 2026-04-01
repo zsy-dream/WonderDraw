@@ -3,14 +3,9 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useUser } from '../contexts/UserContext';
 import LoginModal from './LoginModal';
+import { mockNavConfig, mockPlatformStats } from '../utils/mockData';
 
-const NAV_ITEMS = [
-  { path: '/', label: '画廊', icon: '🏛️' },
-  { path: '/workspace', label: '工作台', icon: '🎨' },
-  { path: '/progress', label: '成长档案', icon: '📊', needsAuth: true },
-  { path: '/teacher', label: '教师端', icon: '👨‍🏫' },
-  { path: '/faq', label: '合作与FAQ', icon: '🤝' },
-];
+const NAV_ITEMS = mockNavConfig.items;
 
 function NavBar() {
   const navigate = useNavigate();
@@ -48,9 +43,14 @@ function NavBar() {
               onClick={() => navigate('/')}
             >
               <span className="text-2xl">🎨</span>
-              <span className="font-bold text-lg" style={{ color: 'var(--color-primary)' }}>
-                童画·奇境
-              </span>
+              <div className="flex flex-col leading-none">
+                <span className="font-bold text-lg" style={{ color: 'var(--color-primary)' }}>
+                  {mockNavConfig.brandName}
+                </span>
+                <span className="text-[10px] text-gray-400 mt-1">
+                  {mockNavConfig.statsPrefix} {mockPlatformStats.showcaseWorks} {mockNavConfig.worksUnit} · {mockPlatformStats.partnerCount} {mockNavConfig.partnerUnit}
+                </span>
+              </div>
             </motion.div>
 
             {/* Nav Links */}
@@ -84,7 +84,7 @@ function NavBar() {
                     onClick={logout}
                     className="text-xs text-gray-400 hover:text-gray-600 px-2 py-1"
                   >
-                    退出
+                    {mockNavConfig.logoutLabel}
                   </button>
                 </div>
               ) : (
@@ -93,7 +93,7 @@ function NavBar() {
                   className="text-sm px-3 py-1.5 rounded-lg text-white font-medium"
                   style={{ backgroundColor: 'var(--color-primary)' }}
                 >
-                  登录
+                  {mockNavConfig.loginLabel}
                 </button>
               )}
             </div>

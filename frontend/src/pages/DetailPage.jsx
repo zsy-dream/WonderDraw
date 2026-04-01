@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { creationAPI, aiAPI } from '../services/api';
+import { useDemo } from '../contexts/DemoContext';
 import InteractiveStory from '../components/InteractiveStory';
 import ParentVoiceOver from '../components/ParentVoiceOver';
 import BlockchainCertificate from '../components/BlockchainCertificate';
@@ -16,10 +17,13 @@ import { exportCreationVideo } from '../services/videoExport';
 function DetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { state: demoState } = useDemo();
   const [creation, setCreation] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const toastRef = React.useRef(null);
+
+  const forced = demoState?.enabled ? demoState?.forced?.detail : 'normal';
 
   const [storyData, setStoryData] = useState(null);
   const [isStoryProcessing, setIsStoryProcessing] = useState(false);
@@ -32,6 +36,15 @@ function DetailPage() {
     try {
       setIsLoading(true);
       setError(null);
+
+      if (forced === 'loading') {
+        return;
+      }
+      if (forced === 'error') {
+        setError('加载作品失败');
+        return;
+      }
+
       const response = await creationAPI.getCreationDetail(id);
       
       if (response.success) {

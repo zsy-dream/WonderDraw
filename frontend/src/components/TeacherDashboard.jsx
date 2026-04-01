@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { teacherAPI } from '../services/api';
 import PublishedWorksShowcase from './PublishedWorksShowcase';
+import { mockTeacherDashboard } from '../utils/mockData';
 
 /**
  * 教师管理看板组件
@@ -9,7 +10,6 @@ import PublishedWorksShowcase from './PublishedWorksShowcase';
  */
 function TeacherDashboard({ classData }) {
   const [activeTab, setActiveTab] = useState('overview');
-  const [selectedStudent, setSelectedStudent] = useState(null);
   const [dashboardData, setDashboardData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -34,13 +34,14 @@ function TeacherDashboard({ classData }) {
 
   // 默认数据（API未返回时使用）
   const fallbackData = {
-    className: '创意美术班',
-    studentCount: 0,
-    totalWorks: 0,
-    thisWeekWorks: 0,
-    averageAbility: 0,
-    topStudents: [],
-    recentWorks: []
+    className: mockTeacherDashboard.className,
+    studentCount: mockTeacherDashboard.studentCount,
+    totalWorks: mockTeacherDashboard.totalWorks,
+    thisWeekWorks: mockTeacherDashboard.thisWeekWorks,
+    averageAbility: mockTeacherDashboard.averageAbility,
+    topStudents: mockTeacherDashboard.topStudents,
+    recentWorks: mockTeacherDashboard.recentWorks,
+    abilityDistribution: mockTeacherDashboard.abilityDistribution
   };
 
   const data = classData || dashboardData || fallbackData;
@@ -184,7 +185,6 @@ function TeacherDashboard({ classData }) {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}
-                  onClick={() => setSelectedStudent(student)}
                   className="bg-white rounded-xl p-4 border border-gray-200 cursor-pointer hover:shadow-md transition-shadow"
                 >
                   <div className="flex items-center gap-3">
@@ -233,19 +233,19 @@ function TeacherDashboard({ classData }) {
             <div className="bg-white rounded-xl p-6 border border-gray-200">
               <h3 className="font-bold text-gray-800 mb-4">班级能力分布</h3>
               <div className="space-y-3">
-                {['色彩感知', '构图能力', '叙事想象', '细节丰富', '创意独特'].map((ability, index) => (
-                  <div key={ability} className="flex items-center gap-3">
-                    <span className="w-20 text-sm text-gray-600">{ability}</span>
+                {(data.abilityDistribution || mockTeacherDashboard.abilityDistribution).map((ability, index) => (
+                  <div key={ability.label} className="flex items-center gap-3">
+                    <span className="w-20 text-sm text-gray-600">{ability.label}</span>
                     <div className="flex-1 bg-gray-200 rounded-full h-4">
                       <motion.div
                         initial={{ width: 0 }}
-                        animate={{ width: `${[85, 78, 72, 80, 75][index]}%` }}
+                        animate={{ width: `${ability.score}%` }}
                         transition={{ delay: index * 0.1, duration: 0.5 }}
                         className="h-full bg-gradient-to-r from-blue-400 to-purple-400 rounded-full"
                       />
                     </div>
                     <span className="w-10 text-sm font-medium text-gray-700">
-                      {[85, 78, 72, 80, 75][index]}分
+                      {ability.score}分
                     </span>
                   </div>
                 ))}

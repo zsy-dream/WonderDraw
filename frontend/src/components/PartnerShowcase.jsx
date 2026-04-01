@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
+import { mockPartners } from '../utils/mockData';
 
 /**
  * 合作伙伴展示橱窗
@@ -7,84 +8,7 @@ import { motion } from 'framer-motion';
  */
 function PartnerShowcase() {
   const [hoveredPartner, setHoveredPartner] = useState(null);
-
-  // 虚拟合作伙伴数据
-  const partners = [
-    // 出版社
-    {
-      id: 'pub_tongqu',
-      type: 'publisher',
-      name: '童趣出版社',
-      logo: '📚',
-      status: 'partnered',
-      statusLabel: '已合作',
-      statusColor: 'green',
-      collaborator: '签约编辑: 张老师',
-      description: '专注3-12岁儿童原创绘本出版，已签署版权合作协议',
-      benefit: '稿件录用率提升 40%'
-    },
-    {
-      id: 'pub_kuaile',
-      type: 'publisher',
-      name: '快乐童书',
-      logo: '🏫',
-      status: 'negotiating',
-      statusLabel: '意向中',
-      statusColor: 'amber',
-      collaborator: '对接人: 李经理',
-      description: '优质儿童故事合集投稿通道，商务洽谈进行中',
-      benefit: '预计 30% 收益分成'
-    },
-    {
-      id: 'pub_xingchen',
-      type: 'publisher',
-      name: '星辰工作室',
-      logo: '🎬',
-      status: 'negotiating',
-      statusLabel: '意向中',
-      statusColor: 'amber',
-      collaborator: '对接人: 王导演',
-      description: '儿童动画短片改编制作，IP 孵化合作伙伴',
-      benefit: '全球发行渠道'
-    },
-    // 学校
-    {
-      id: 'school_primary_1',
-      type: 'school',
-      name: '阳光小学',
-      logo: '🏫',
-      status: 'partnered',
-      statusLabel: '已合作',
-      statusColor: 'green',
-      collaborator: '对接教师: 刘老师',
-      description: '美育课程辅助工具试点应用，覆盖 3 个班级',
-      benefit: '教师端功能深度定制'
-    },
-    {
-      id: 'school_primary_2',
-      type: 'school',
-      name: '星辰国际学校',
-      logo: '🎓',
-      status: 'partnered',
-      statusLabel: '已合作',
-      statusColor: 'green',
-      collaborator: '对接教师: 王老师',
-      description: '创意写作课程合作伙伴，覆盖 5 个班级',
-      benefit: '教学成果量化分析'
-    },
-    {
-      id: 'school_primary_3',
-      type: 'school',
-      name: '未来幼儿园',
-      logo: '👶',
-      status: 'negotiating',
-      statusLabel: '意向中',
-      statusColor: 'amber',
-      collaborator: '对接人: 陈园长',
-      description: '学前教育创意启蒙项目洽谈中',
-      benefit: '3-6 岁年龄段内容定制'
-    }
-  ];
+  const partners = mockPartners;
 
   const getStatusBadge = (partner) => {
     const colors = {
@@ -145,7 +69,7 @@ function PartnerShowcase() {
           className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-4 text-center border border-purple-200"
         >
           <div className="text-3xl mb-2">🎯</div>
-          <div className="text-2xl font-bold text-purple-700">6</div>
+          <div className="text-2xl font-bold text-purple-700">{partners.length}</div>
           <div className="text-sm text-purple-600">总合作伙伴</div>
         </motion.div>
       </div>
@@ -200,6 +124,10 @@ function PartnerShowcase() {
                   <span>💰</span>
                   <span>{partner.benefit}</span>
                 </div>
+                <div className="flex items-center gap-2 text-xs text-gray-500">
+                  <span>✨</span>
+                  <span>{partner.highlight}</span>
+                </div>
               </div>
 
               {/* 悬停效果：显示详情 */}
@@ -213,6 +141,7 @@ function PartnerShowcase() {
                     <div className="text-5xl mb-4">{partner.logo}</div>
                     <h4 className="text-xl font-bold mb-2">{partner.name}</h4>
                     <p className="text-sm opacity-80 mb-4">{partner.description}</p>
+                    <p className="text-xs opacity-80 mb-4">{partner.stageNote}</p>
                     {partner.status === 'partnered' ? (
                       <div className="bg-white/20 backdrop-blur rounded-lg px-4 py-2 text-sm">
                         ✅ 已签约合作，学生作品可直接投稿

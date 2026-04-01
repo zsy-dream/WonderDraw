@@ -30,7 +30,9 @@ class Config:
     # LLM 配置
     LLM_PROVIDER = os.environ.get('LLM_PROVIDER', 'deepseek')
     LLM_API_KEY = os.environ.get('LLM_API_KEY', '')
-    LLM_API_URL = os.environ.get('LLM_API_URL', 'https://api.deepseek.com/v1/chat/completions')
+    # 华为云 ModelArts MaaS 平台配置（OpenAI 兼容格式）
+    LLM_API_URL = os.environ.get('LLM_API_URL', 'https://api.modelarts-maas.com/v2/chat/completions')
+    LLM_MODEL_NAME = os.environ.get('LLM_MODEL_NAME', 'deepseek-v3.2')
     LLM_MAX_TOKENS = 500
     LLM_TEMPERATURE = 0.8
     

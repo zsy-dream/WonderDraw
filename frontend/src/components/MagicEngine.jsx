@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CREATION_STEPS, STEP_LABELS, STEP_ICONS } from '../utils/constants';
+import { mockMagicEngineText } from '../utils/mockData';
 
 /**
  * 魔法引擎组件
@@ -187,7 +188,7 @@ function MagicEngine({
               {STEP_LABELS[currentStep] || '处理中...'}
             </h3>
             <p className="text-gray-600">
-              AI 正在施展魔法，请稍候...
+              {mockMagicEngineText.processingHint}
             </p>
           </motion.div>
         )}
@@ -217,10 +218,10 @@ function MagicEngine({
                 🎉
               </motion.div>
               <h3 className="text-2xl font-bold text-green-600 mb-2">
-                创作完成！
+                {mockMagicEngineText.completedTitle}
               </h3>
               <p className="text-gray-600">
-                你的画作已经变成了一个完整的故事
+                {mockMagicEngineText.completedSubtitle}
               </p>
             </div>
 
@@ -308,7 +309,7 @@ function MagicEngine({
           >
             <div className="text-6xl mb-4">😔</div>
             <h3 className="text-xl font-bold text-red-600 mb-2">
-              创作遇到问题
+              {mockMagicEngineText.errorTitle}
             </h3>
             <p className="text-gray-600 mb-4">
               {error}

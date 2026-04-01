@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useUser } from '../contexts/UserContext';
+import { mockLoginModalCopy } from '../utils/mockData';
 
 /**
  * 用户登录/注册模态框
@@ -59,17 +60,17 @@ function LoginModal({ isOpen, onClose, initialMode = 'login' }) {
 
     if (mode === 'register') {
       if (!formData.nickname) {
-        setError('请输入昵称');
+        setError(mockLoginModalCopy.errors.nicknameRequired);
         return false;
       }
 
       if (formData.password.length < 6) {
-        setError('密码至少需要6个字符');
+        setError(mockLoginModalCopy.errors.passwordTooShort);
         return false;
       }
 
       if (formData.password !== formData.confirmPassword) {
-        setError('两次输入的密码不一致');
+        setError(mockLoginModalCopy.errors.passwordMismatch);
         return false;
       }
     }
@@ -101,7 +102,7 @@ function LoginModal({ isOpen, onClose, initialMode = 'login' }) {
       }
 
       if (result.success) {
-        setSuccess(mode === 'login' ? '登录成功！' : '注册成功！');
+        setSuccess(mode === 'login' ? mockLoginModalCopy.success.login : mockLoginModalCopy.success.register);
         setTimeout(() => {
           onClose();
           resetForm();
@@ -110,7 +111,7 @@ function LoginModal({ isOpen, onClose, initialMode = 'login' }) {
         setError(result.error);
       }
     } catch (err) {
-      setError('操作失败，请重试');
+      setError(mockLoginModalCopy.errors.actionFailed);
     } finally {
       setIsLoading(false);
     }
@@ -138,10 +139,10 @@ function LoginModal({ isOpen, onClose, initialMode = 'login' }) {
           {/* 头部 */}
           <div className="bg-gradient-to-r from-yellow-400 to-orange-400 p-6 text-white">
             <h2 className="text-2xl font-bold text-center">
-              {mode === 'login' ? '🌟 欢迎回来' : '✨ 加入童话世界'}
+              {mode === 'login' ? mockLoginModalCopy.header.loginTitle : mockLoginModalCopy.header.registerTitle}
             </h2>
             <p className="text-center mt-2 text-white/90">
-              {mode === 'login' ? '登录你的魔法账户' : '创建你的创作账户'}
+              {mode === 'login' ? mockLoginModalCopy.header.loginSubtitle : mockLoginModalCopy.header.registerSubtitle}
             </p>
           </div>
 
@@ -151,14 +152,14 @@ function LoginModal({ isOpen, onClose, initialMode = 'login' }) {
             {mode === 'register' && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  🎭 昵称
+                  {mockLoginModalCopy.labels.nickname}
                 </label>
                 <input
                   type="text"
                   name="nickname"
                   value={formData.nickname}
                   onChange={handleInputChange}
-                  placeholder="给自己起个有趣的名字"
+                  placeholder={mockLoginModalCopy.placeholders.nickname}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition-all"
                   disabled={isLoading}
                 />
@@ -168,14 +169,14 @@ function LoginModal({ isOpen, onClose, initialMode = 'login' }) {
             {/* 邮箱 */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                📧 邮箱
+                {mockLoginModalCopy.labels.email}
               </label>
               <input
                 type="email"
                 name="email"
                 value={formData.email}
                 onChange={handleInputChange}
-                placeholder="your@email.com"
+                placeholder={mockLoginModalCopy.placeholders.email}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition-all"
                 disabled={isLoading}
               />
@@ -184,14 +185,14 @@ function LoginModal({ isOpen, onClose, initialMode = 'login' }) {
             {/* 密码 */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                🔒 密码
+                {mockLoginModalCopy.labels.password}
               </label>
               <input
                 type="password"
                 name="password"
                 value={formData.password}
                 onChange={handleInputChange}
-                placeholder="••••••••"
+                placeholder={mockLoginModalCopy.placeholders.password}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition-all"
                 disabled={isLoading}
               />
@@ -201,14 +202,14 @@ function LoginModal({ isOpen, onClose, initialMode = 'login' }) {
             {mode === 'register' && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  🔒 确认密码
+                  {mockLoginModalCopy.labels.confirmPassword}
                 </label>
                 <input
                   type="password"
                   name="confirmPassword"
                   value={formData.confirmPassword}
                   onChange={handleInputChange}
-                  placeholder="••••••••"
+                  placeholder={mockLoginModalCopy.placeholders.password}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition-all"
                   disabled={isLoading}
                 />
@@ -248,10 +249,10 @@ function LoginModal({ isOpen, onClose, initialMode = 'login' }) {
               {isLoading ? (
                 <span className="flex items-center justify-center gap-2">
                   <span className="animate-spin">⏳</span>
-                  {mode === 'login' ? '登录中...' : '注册中...'}
+                  {mode === 'login' ? mockLoginModalCopy.loading.login : mockLoginModalCopy.loading.register}
                 </span>
               ) : (
-                <span>{mode === 'login' ? '🚀 立即登录' : '🎉 创建账户'}</span>
+                <span>{mode === 'login' ? mockLoginModalCopy.actions.login : mockLoginModalCopy.actions.register}</span>
               )}
             </button>
           </form>

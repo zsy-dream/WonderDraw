@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { voiceoverAPI } from '../services/api';
+import { mockVoiceoverConfig, mockVoiceoverDemoVoices } from '../utils/mockData';
 
 /**
  * 真正的家长配音组件 - 使用 Web Audio API 录音
@@ -21,7 +22,7 @@ function ParentVoiceOver({ creationId, onVoiceAdded }) {
   const speechRef = useRef(null);
   const playingIdRef = useRef(null);
 
-  const MAX_CLIPS = 10;
+  const MAX_CLIPS = mockVoiceoverConfig.maxClips;
 
   const blobToDataUrl = (blob) => {
     return new Promise((resolve, reject) => {
@@ -343,12 +344,7 @@ function ParentVoiceOver({ creationId, onVoiceAdded }) {
     }, 2500);
   };
 
-  // 示例音频（模拟不同家庭成员）
-  const demoVoices = [
-    { id: 'mom', name: '妈妈温柔版', speaker: '妈妈', emoji: '👩', duration: '0:08', text: '宝贝，今天我们一起进入童话世界吧。' },
-    { id: 'dad', name: '爸爸幽默版', speaker: '爸爸', emoji: '👨', duration: '0:06', text: '哈哈！小英雄，准备好开始冒险了吗？' },
-    { id: 'grandma', name: '奶奶慈祥版', speaker: '奶奶', emoji: '👵', duration: '0:10', text: '乖孩子，奶奶给你讲一个温暖的故事。' }
-  ];
+  const demoVoices = mockVoiceoverDemoVoices;
 
   // 添加示例音频
   const addDemoVoice = (demo) => {
@@ -382,10 +378,10 @@ function ParentVoiceOver({ creationId, onVoiceAdded }) {
       {/* 标题 */}
       <div className="text-center">
         <h3 className="text-xl font-bold text-gray-800 mb-2">
-          🎙️ 家长配音室
+          {mockVoiceoverConfig.title}
         </h3>
         <p className="text-sm text-gray-600">
-          为孩子的作品录制专属旁白，创造独特的亲子记忆
+          {mockVoiceoverConfig.subtitle}
         </p>
       </div>
 
@@ -447,7 +443,7 @@ function ParentVoiceOver({ creationId, onVoiceAdded }) {
       {/* 示例音频选择 */}
       <div className="space-y-3">
         <h4 className="text-sm font-bold text-gray-700">
-          🎭 快速选择示例配音
+          {mockVoiceoverConfig.demoTitle}
         </h4>
         <div className="grid grid-cols-3 gap-2">
           {demoVoices.map((voice) => (
@@ -530,7 +526,7 @@ function ParentVoiceOver({ creationId, onVoiceAdded }) {
       {/* 提示 */}
       <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-sm text-amber-800">
         <span className="mr-2">💡</span>
-        录音会保存在您的设备本地，每个作品最多保存10条配音
+        {mockVoiceoverConfig.footerTip}
       </div>
     </div>
   );

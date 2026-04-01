@@ -2,12 +2,17 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import TeacherDashboard from '../components/TeacherDashboard';
+import { useDemo } from '../contexts/DemoContext';
+import { mockTeacherPageCopy } from '../utils/mockData';
 
 /**
  * 教师端管理页面
  */
 function TeacherPage() {
   const navigate = useNavigate();
+  const { state: demoState } = useDemo();
+
+  const forced = demoState?.enabled ? demoState?.forced?.teacher : 'normal';
 
   return (
     <div className="min-h-screen gradient-bg">
@@ -20,15 +25,15 @@ function TeacherPage() {
         <div className="container mx-auto flex items-center justify-between">
           <div>
             <h1 className="text-4xl font-bold mb-2" style={{ color: 'var(--color-primary)' }}>
-              👨‍🏫 教师工作台
+              {mockTeacherPageCopy.title}
             </h1>
-            <p className="text-lg text-gray-600">班级管理与学生创作追踪</p>
+            <p className="text-lg text-gray-600">{mockTeacherPageCopy.subtitle}</p>
           </div>
           <button
             onClick={() => navigate('/')}
             className="clay-button px-6 py-3"
           >
-            返回画廊
+            {mockTeacherPageCopy.backButton}
           </button>
         </div>
       </motion.header>
@@ -41,7 +46,25 @@ function TeacherPage() {
             animate={{ opacity: 1, scale: 1 }}
             className="clay-card"
           >
-            <TeacherDashboard />
+            {forced === 'error' ? (
+              <div className="text-center py-12">
+                <div className="text-4xl mb-4">😢</div>
+                <p className="text-gray-500">加载教师看板失败</p>
+              </div>
+            ) : forced === 'loading' ? (
+              <div className="text-center py-12">
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
+                  className="text-4xl inline-block mb-4"
+                >
+                  ✨
+                </motion.div>
+                <p className="text-gray-500">加载中...</p>
+              </div>
+            ) : (
+              <TeacherDashboard />
+            )}
           </motion.div>
         </div>
       </div>

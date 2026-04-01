@@ -1,7 +1,18 @@
 import axios from 'axios';
 
+import { getMockCreationDetail, getMockUserProgress, mockCreations, mockTeacherDashboard } from '../utils/mockData';
+
 // API 基础配置
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+const resolveApiBaseUrl = () => {
+  const envUrl = import.meta.env.VITE_API_BASE_URL;
+  // 统一走 Vite proxy（避免跨域/不同域名导致的 Network Error）
+  if (!envUrl) return '/api';
+  // 仅接受相对路径（如 /api），绝对 URL 会导致跨域问题
+  if (typeof envUrl === 'string' && envUrl.startsWith('/')) return envUrl;
+  return '/api';
+};
+
+const API_BASE_URL = resolveApiBaseUrl();
 
 // 创建 axios 实例
 const apiClient = axios.create({
@@ -11,6 +22,28 @@ const apiClient = axios.create({
     'Content-Type': 'application/json',
   },
 });
+
+const isDemoMode = String(import.meta.env.VITE_DEMO_MODE || '').toLowerCase() === 'true';
+
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+const demoOk = async (data, delayMs = 350) => {
+  await sleep(delayMs);
+  return { success: true, data };
+};
+
+const demoId = (prefix) => `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+
+const demoObjectUrlFromFile = (file) => {
+  try {
+    if (typeof window !== 'undefined' && window.URL && file instanceof File) {
+      return window.URL.createObjectURL(file);
+    }
+  } catch (_) {
+    // ignore
+  }
+  return null;
+};
 
 // 请求拦截器
 apiClient.interceptors.request.use(
@@ -45,12 +78,28 @@ export const userAPI = {
   createUser: (nickname) => apiClient.post('/users', { nickname }),
   getUser: (userId) => apiClient.get(`/users/${userId}`),
   getUserCreations: (userId) => apiClient.get(`/users/${userId}/creations`),
-  getUserProgress: (userId) => apiClient.get(`/users/${userId}/progress`),
+  getUserProgress: async (userId) => {
+    if (isDemoMode) {
+      return demoOk(getMockUserProgress(userId));
+    }
+    return apiClient.get(`/users/${userId}/progress`);
+  },
 };
 
 // 作品上传 API
 export const artworkAPI = {
   uploadArtwork: (file, userId) => {
+    if (isDemoMode) {
+      const objectUrl = demoObjectUrlFromFile(file);
+      const fallback = mockCreations[0]?.original_image;
+      return demoOk({
+        id: demoId('demo_artwork'),
+        user_id: userId,
+        file_path: objectUrl || fallback,
+        original_filename: file?.name || 'demo.png',
+        created_at: new Date().toISOString()
+      }, 600);
+    }
     const formData = new FormData();
     formData.append('file', file);
     formData.append('user_id', userId);
@@ -63,35 +112,120 @@ export const artworkAPI = {
 
 // AI 处理 API
 export const aiAPI = {
-  enhanceImage: (artworkId, creationId) => 
-    apiClient.post(`/artworks/${artworkId}/enhance`, { creation_id: creationId }),
-  generateAnimation: (artworkId, creationId, enhancedImage) => 
-    apiClient.post(`/artworks/${artworkId}/animate`, { 
-      creation_id: creationId, 
-      enhanced_image: enhancedImage 
-    }),
-  generateStory: (artworkId, creationId, selectedChoice = null) => 
-    apiClient.post(`/artworks/${artworkId}/story`, { 
+  enhanceImage: async (artworkId, creationId) => {
+    if (isDemoMode) {
+      const enhanced = mockCreations[0]?.enhanced_image;
+      return demoOk({ enhanced_image: enhanced, creation_id: creationId, artwork_id: artworkId }, 900);
+    }
+    return apiClient.post(`/artworks/${artworkId}/enhance`, { creation_id: creationId });
+  },
+  generateAnimation: async (artworkId, creationId, enhancedImage) => {
+    if (isDemoMode) {
+      const animation = mockCreations[0]?.animation;
+      return demoOk({
+        animation,
+        enhanced_image: enhancedImage || mockCreations[0]?.enhanced_image,
+        creation_id: creationId,
+        artwork_id: artworkId
+      }, 1100);
+    }
+    return apiClient.post(`/artworks/${artworkId}/animate`, {
+      creation_id: creationId,
+      enhanced_image: enhancedImage
+    });
+  },
+  generateStory: async (artworkId, creationId, selectedChoice = null) => {
+    if (isDemoMode) {
+      const detail = getMockCreationDetail('demo_creation_001');
+      const interactive = detail?.interactive_story || null;
+
+      if (!interactive) {
+        return demoOk({ story: mockCreations[0]?.story, full_story: detail?.full_story || mockCreations[0]?.story }, 900);
+      }
+
+      const rootNode = 'root';
+      const currentNode = selectedChoice || rootNode;
+      const node = interactive[currentNode] || interactive[rootNode];
+      const story_path = selectedChoice ? [rootNode, selectedChoice] : [rootNode];
+
+      return demoOk({
+        story: node?.text || mockCreations[0]?.story,
+        full_story: detail?.full_story || mockCreations[0]?.story,
+        interactive_story: interactive,
+        current_node: currentNode,
+        story_path,
+        has_choices: Boolean(node?.choices?.length),
+        choices: node?.choices || []
+      }, 950);
+    }
+    return apiClient.post(`/artworks/${artworkId}/story`, {
       creation_id: creationId,
       selected_choice: selectedChoice
-    }),
-  getCreativeGuidance: (creationId, step = 1, artworkDescription = '') =>
-    apiClient.post(`/creations/${creationId}/guidance`, {
+    });
+  },
+  getCreativeGuidance: async (creationId, step = 1, artworkDescription = '') => {
+    if (isDemoMode) {
+      return demoOk({
+        title: '🧠 AI 创作引导',
+        suggestions: [
+          '试着在画面里加入一个“主角”，让故事更集中',
+          '给背景增加 2-3 个小细节（云、星星、树叶）会更生动',
+          '想一想：主角想要什么？遇到了什么困难？最后怎么解决？'
+        ],
+        encouragement: '你已经很棒了，再多一点点细节就会像动画一样鲜活！',
+        step,
+        artwork_description: artworkDescription,
+        creation_id: creationId
+      }, 550);
+    }
+    return apiClient.post(`/creations/${creationId}/guidance`, {
       step,
       artwork_description: artworkDescription
-    }),
+    });
+  },
 };
 
 // 创作管理 API
 export const creationAPI = {
-  createCreation: (artworkId, userId, originalImage) => 
-    apiClient.post('/creations', { 
-      artwork_id: artworkId, 
-      user_id: userId, 
-      original_image: originalImage 
-    }),
-  getCreations: (params = {}) => apiClient.get('/creations', { params }),
-  getCreationDetail: (creationId) => apiClient.get(`/creations/${creationId}`),
+  createCreation: async (artworkId, userId, originalImage) => {
+    if (isDemoMode) {
+      const id = demoId('demo_creation');
+      return demoOk({
+        id,
+        artwork_id: artworkId,
+        user_id: userId,
+        original_image: originalImage,
+        enhanced_image: null,
+        animation: null,
+        story: null,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      }, 450);
+    }
+    return apiClient.post('/creations', {
+      artwork_id: artworkId,
+      user_id: userId,
+      original_image: originalImage
+    });
+  },
+  getCreations: async (params = {}) => {
+    if (isDemoMode) {
+      const limit = Number(params?.limit || 50);
+      return demoOk({ creations: mockCreations.slice(0, limit), total: mockCreations.length });
+    }
+    return apiClient.get('/creations', { params });
+  },
+  getCreationDetail: async (creationId) => {
+    if (isDemoMode) {
+      const detail = getMockCreationDetail(creationId);
+      if (!detail) {
+        await sleep(250);
+        return { success: false, error: '作品不存在' };
+      }
+      return demoOk(detail);
+    }
+    return apiClient.get(`/creations/${creationId}`);
+  },
   updateCreation: (creationId, updates) => 
     apiClient.put(`/creations/${creationId}`, updates),
   deleteCreation: (creationId) => apiClient.delete(`/creations/${creationId}`),
@@ -109,19 +243,53 @@ export const authAPI = {
 
 // 区块链存证 API
 export const blockchainAPI = {
-  certify: (creationId) => apiClient.post('/blockchain/certify', { creation_id: creationId }),
-  getCertificate: (creationId) => apiClient.get(`/blockchain/cert/${creationId}`),
+  certify: async (creationId) => {
+    if (isDemoMode) {
+      return demoOk({
+        id: `CERT_${String(creationId || '').slice(0, 8)}_${Date.now()}`,
+        blockchain: 'WonderChain Testnet',
+        tx_hash: `0x${Math.random().toString(16).slice(2).padEnd(64, '0')}`.slice(0, 66),
+        block_number: 123456 + Math.floor(Math.random() * 2000),
+        timestamp: new Date().toISOString(),
+        content_hash: `0x${Math.random().toString(16).slice(2).padEnd(64, 'a')}`.slice(0, 66),
+        status: '已存证'
+      }, 900);
+    }
+    return apiClient.post('/blockchain/certify', { creation_id: creationId });
+  },
+  getCertificate: async (creationId) => {
+    if (isDemoMode) {
+      await sleep(300);
+      return { success: false, error: '未存证' };
+    }
+    return apiClient.get(`/blockchain/cert/${creationId}`);
+  },
 };
 
 // 配音管理 API
 export const voiceoverAPI = {
-  save: (data) => apiClient.post('/voiceover', data),
-  getByCreation: (creationId) => apiClient.get(`/voiceover/${creationId}`),
+  save: (data) => {
+    if (isDemoMode) {
+      return demoOk({ id: demoId('demo_voiceover'), ...data }, 250);
+    }
+    return apiClient.post('/voiceover', data);
+  },
+  getByCreation: async (creationId) => {
+    if (isDemoMode) {
+      return demoOk([], 250);
+    }
+    return apiClient.get(`/voiceover/${creationId}`);
+  },
 };
 
 // 教师管理 API
 export const teacherAPI = {
-  getDashboard: () => apiClient.get('/teacher/dashboard'),
+  getDashboard: async () => {
+    if (isDemoMode) {
+      return demoOk(mockTeacherDashboard, 500);
+    }
+    return apiClient.get('/teacher/dashboard');
+  },
   getStudents: () => apiClient.get('/teacher/students'),
 };
 

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
+import { mockBusinessModels, mockRevenueForecast } from '../utils/mockData';
 
 /**
  * 商业模式可视化组件
@@ -7,72 +8,7 @@ import { motion } from 'framer-motion';
  */
 function BusinessModelHero() {
   const [activeModel, setActiveModel] = useState(null);
-
-  const businessModels = [
-    {
-      id: 'b2b',
-      title: 'B2B 学校订阅',
-      icon: '🏫',
-      color: 'from-blue-500 to-indigo-600',
-      bgColor: 'bg-blue-50',
-      textColor: 'text-blue-900',
-      borderColor: 'border-blue-200',
-      price: '¥3,000/年/班',
-      description: '面向小学、幼儿园等教育机构提供订阅服务',
-      features: [
-        { label: '50个学生账号', value: '包含' },
-        { label: '教师管理看板', value: '✓' },
-        { label: '作品投稿通道', value: '✓' },
-        { label: '数据分析报告', value: '✓' },
-        { label: '专属客服支持', value: '✓' },
-        { label: 'API对接集成', value: '选配 +¥1,000' }
-      ],
-      market: '全国20万+学校',
-      growth: '年复合增长率 60%'
-    },
-    {
-      id: 'c2c',
-      title: 'C2C 增值功能',
-      icon: '✨',
-      color: 'from-purple-500 to-pink-600',
-      bgColor: 'bg-purple-50',
-      textColor: 'text-purple-900',
-      borderColor: 'border-purple-200',
-      price: '¥9.9/月 或 ¥99/年',
-      description: '面向家长个人用户的高级功能订阅',
-      features: [
-        { label: '无限作品创作', value: '✓' },
-        { label: 'VIP 专属课程', value: '10+节/月' },
-        { label: 'AI 导师1对1', value: '30分钟/月' },
-        { label: '作品优先审核', value: '✓' },
-        { label: '家庭成长报告', value: '✓' },
-        { label: '定制作品书', value: '选配 ¥299起' }
-      ],
-      market: '适龄儿童 1500万+',
-      growth: '月留存率 75%'
-    },
-    {
-      id: 'ip',
-      title: 'IP 孵化分成',
-      icon: '📮',
-      color: 'from-amber-500 to-orange-600',
-      bgColor: 'bg-amber-50',
-      textColor: 'text-amber-900',
-      borderColor: 'border-amber-200',
-      price: '25-35% 收益分成',
-      description: '帮助儿童创作者对接出版社，实现作品变现',
-      features: [
-        { label: '出版社投稿', value: '3家' },
-        { label: '动画改编对接', value: '2家' },
-        { label: '版权跟踪服务', value: '✓' },
-        { label: '收益自动结算', value: '✓' },
-        { label: '作品定价建议', value: '✓' },
-        { label: '法律支持', value: '选配服务' }
-      ],
-      market: '潜在创作者 500万+',
-      growth: '审核通过率 15%'
-    }
-  ];
+  const businessModels = mockBusinessModels;
 
   return (
     <div className="space-y-8">
@@ -187,31 +123,23 @@ function BusinessModelHero() {
       >
         <h3 className="font-bold text-green-900 mb-4 flex items-center gap-2">
           <span>📈</span>
-          <span>收入预期预测（2026-2027）</span>
+          <span>{mockRevenueForecast.title}</span>
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-white rounded-lg p-4">
-            <p className="text-sm text-gray-500 mb-1">2026年目标</p>
-            <p className="text-2xl font-bold text-green-700">¥150万</p>
-            <p className="text-xs text-gray-500 mt-1">B2B: 60% | C2C: 25% | IP: 15%</p>
-          </div>
-          <div className="bg-white rounded-lg p-4">
-            <p className="text-sm text-gray-500 mb-1">2027年预测</p>
-            <p className="text-2xl font-bold text-green-700">¥500万</p>
-            <p className="text-xs text-gray-500 mt-1">B2B: 50% | C2C: 30% | IP: 20%</p>
-          </div>
-          <div className="bg-white rounded-lg p-4">
-            <p className="text-sm text-gray-500 mb-1">客单价贡献</p>
-            <p className="text-2xl font-bold text-green-700">¥135</p>
-            <p className="text-xs text-gray-500 mt-1">学校: ¥3,000 | 家长: ¥99 | IP: ¥500</p>
-          </div>
+          {mockRevenueForecast.cards.map((card) => (
+            <div key={card.label} className="bg-white rounded-lg p-4">
+              <p className="text-sm text-gray-500 mb-1">{card.label}</p>
+              <p className="text-2xl font-bold text-green-700">{card.value}</p>
+              <p className="text-xs text-gray-500 mt-1">{card.detail}</p>
+            </div>
+          ))}
         </div>
       </motion.div>
 
       {/* 底部 disclaimer */}
       <div className="text-center text-xs text-gray-500">
         <p>
-          注意：以上数据为市场预测，实际收入可能因推广效果、市场变化等因素有所差异。
+          {mockRevenueForecast.disclaimer}
           <br/>
           作品版权归创作者所有，平台仅提供投稿渠道，收益分配遵循相关协议。
         </p>

@@ -5,7 +5,9 @@ import ThreeGallery from '../components/ThreeGallery';
 import LoginModal from '../components/LoginModal';
 import PartnerShowcase from '../components/PartnerShowcase';
 import { useUser } from '../contexts/UserContext';
+import { useDemo } from '../contexts/DemoContext';
 import { creationAPI } from '../services/api';
+import { mockGalleryCopy } from '../utils/mockData';
 
 /**
  * 奇境入口 - 3D 漂浮展厅
@@ -14,10 +16,13 @@ import { creationAPI } from '../services/api';
 function GalleryPage() {
   const navigate = useNavigate();
   const { currentUser, isLoggedIn } = useUser();
+  const { state: demoState } = useDemo();
   const [showLogin, setShowLogin] = useState(false);
   const [creations, setCreations] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const forced = demoState?.enabled ? demoState?.forced?.gallery : 'normal';
 
   // 加载作品列表
   useEffect(() => {
@@ -28,17 +33,31 @@ function GalleryPage() {
     try {
       setIsLoading(true);
       setError(null);
+
+      if (forced === 'loading') {
+        return;
+      }
+      if (forced === 'error') {
+        setError(mockGalleryCopy.errors.loadFailed);
+        setCreations([]);
+        return;
+      }
+      if (forced === 'empty') {
+        setCreations([]);
+        return;
+      }
+
       const response = await creationAPI.getCreations({ limit: 50 });
       
       if (response.success) {
         setCreations(response.data.creations || []);
       } else {
-        setError('加载作品失败');
+        setError(mockGalleryCopy.errors.loadFailed);
         setCreations([]);
       }
     } catch (err) {
       console.error('Failed to load creations:', err);
-      setError('加载作品失败，请检查网络连接');
+      setError(mockGalleryCopy.errors.networkFailed);
       setCreations([]);
     } finally {
       setIsLoading(false);
@@ -66,12 +85,12 @@ function GalleryPage() {
         className="p-8 text-center"
       >
         <h1 className="text-5xl font-bold mb-4" style={{ color: 'var(--color-primary)' }}>
-          童话·奇境
+          {mockGalleryCopy.title}
         </h1>
-        <p className="text-xl text-gray-600">欢迎来到魔法画廊</p>
+        <p className="text-xl text-gray-600">{mockGalleryCopy.subtitle}</p>
         {currentUser && (
           <p className="text-sm text-gray-500 mt-2">
-            欢迎回来，{currentUser.nickname}！
+            {mockGalleryCopy.welcomeBackPrefix}{currentUser.nickname}{mockGalleryCopy.welcomeBackSuffix}
           </p>
         )}
       </motion.header>
@@ -87,7 +106,7 @@ function GalleryPage() {
             >
               ✨
             </motion.div>
-            <p className="text-gray-600">加载作品中...</p>
+            <p className="text-gray-600">{mockGalleryCopy.loadingText}</p>
           </div>
         ) : error ? (
           <div className="clay-card text-center py-12">
@@ -98,24 +117,24 @@ function GalleryPage() {
               className="clay-button px-6 py-3"
               style={{ backgroundColor: 'var(--color-primary)', color: 'white' }}
             >
-              重试
+              {mockGalleryCopy.retryButton}
             </button>
           </div>
         ) : creations.length === 0 ? (
           <div className="clay-card text-center py-12">
             <div className="text-6xl mb-4">🎨</div>
             <h3 className="text-2xl font-bold mb-2" style={{ color: 'var(--color-primary)' }}>
-              还没有作品
+              {mockGalleryCopy.emptyState.title}
             </h3>
             <p className="text-gray-600 mb-6">
-              成为第一个创作者，开启你的魔法之旅！
+              {mockGalleryCopy.emptyState.description}
             </p>
             <button
               onClick={handleStartCreation}
               className="clay-button px-8 py-3 text-white"
               style={{ backgroundColor: 'var(--color-primary)' }}
             >
-              开始创作 ✨
+              {mockGalleryCopy.startButton}
             </button>
           </div>
         ) : (
@@ -135,9 +154,9 @@ function GalleryPage() {
         >
           <div className="text-center mb-8">
             <h2 className="text-3xl font-bold mb-2" style={{ color: 'var(--color-primary)' }}>
-              🤝 合作伙伴
+              {mockGalleryCopy.partnerSection.title}
             </h2>
-            <p className="text-gray-600">与优秀出版机构、学校共同为儿童创作者提供机会</p>
+            <p className="text-gray-600">{mockGalleryCopy.partnerSection.description}</p>
           </div>
           <PartnerShowcase />
         </motion.div>
@@ -157,7 +176,7 @@ function GalleryPage() {
           className="clay-button text-white px-8 py-4 text-lg font-bold shadow-lg"
           style={{ backgroundColor: 'var(--color-primary)' }}
         >
-          开始创作 ✨
+          {mockGalleryCopy.startButton}
         </button>
       </motion.div>
 

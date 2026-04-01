@@ -20,6 +20,13 @@
       "filename": "20260224_002037_434227_2b069d_watermarked.jpg",
       "file_path": "http://localhost:5001/storage/images/original/0b23461e-8d59-4f72-a465-2ff87cd90c81_20260224_002037_434227_2b069d_watermarked.jpg",
       "created_at": "2026-02-27T00:36:13.044991"
+    },
+    {
+      "id": "02a57ab8-5d14-466a-a38e-69b4947c6613",
+      "user_id": "test-user-123",
+      "filename": "test.jpg",
+      "file_path": "http://localhost:5001/storage/images/original/02a57ab8-5d14-466a-a38e-69b4947c6613_test.jpg",
+      "created_at": "2026-03-11T23:29:54.151140"
     }
   ]
 }

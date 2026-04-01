@@ -1,30 +1,17 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { mockAbilityConfig, mockAbilityDefaultScores } from '../utils/mockData';
 
 /**
  * 能力雷达图组件
  * 展示儿童5维创作能力评估
  */
 function AbilityRadarChart({ scores = {} }) {
-  // 默认分数
-  const defaultScores = {
-    color_perception: 70,
-    composition: 70,
-    narrative: 70,
-    detail_richness: 70,
-    creativity: 70
-  };
+  const defaultScores = mockAbilityDefaultScores;
   
   const finalScores = { ...defaultScores, ...scores };
   
-  // 能力维度配置
-  const abilities = [
-    { key: 'color_perception', label: '色彩感知', color: '#FF6B6B' },
-    { key: 'composition', label: '构图能力', color: '#4ECDC4' },
-    { key: 'narrative', label: '叙事想象', color: '#45B7D1' },
-    { key: 'detail_richness', label: '细节丰富', color: '#96CEB4' },
-    { key: 'creativity', label: '创意独特', color: '#FFEAA7' }
-  ];
+  const abilities = mockAbilityConfig;
   
   // 雷达图参数
   const size = 200;
