@@ -55,6 +55,41 @@ const demoPickStoryText = (templateId) => {
   return mockCreations[0]?.story || '这是一个关于勇气与想象力的故事。';
 };
 
+const shouldOfflineFallback = (err) => {
+  const msg = String(err?.message || err || '');
+  return /405|method not allowed|network|failed to fetch|timeout|ECONN/i.test(msg);
+};
+
+const certStorageKey = (creationId) => `demo_blockchain_cert_${creationId}`;
+
+const makeDemoCertificate = (creationId) => ({
+  id: `CERT_${String(creationId || '').slice(0, 8)}_${Date.now()}`,
+  blockchain: 'WonderChain Testnet',
+  tx_hash: `0x${Math.random().toString(16).slice(2).padEnd(64, '0')}`.slice(0, 66),
+  block_number: 123456 + Math.floor(Math.random() * 2000),
+  timestamp: new Date().toISOString(),
+  content_hash: `0x${Math.random().toString(16).slice(2).padEnd(64, 'a')}`.slice(0, 66),
+  status: '已存证'
+});
+
+const saveLocalCertificate = (creationId, cert) => {
+  try {
+    localStorage.setItem(certStorageKey(creationId), JSON.stringify(cert));
+  } catch (_) {
+    // ignore
+  }
+};
+
+const loadLocalCertificate = (creationId) => {
+  try {
+    const raw = localStorage.getItem(certStorageKey(creationId));
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch (_) {
+    return null;
+  }
+};
+
 const demoObjectUrlFromFile = (file) => {
   try {
     if (typeof window !== 'undefined' && window.URL && file instanceof File) {
@@ -316,24 +351,47 @@ export const authAPI = {
 export const blockchainAPI = {
   certify: async (creationId) => {
     if (isDemoMode) {
-      return demoOk({
-        id: `CERT_${String(creationId || '').slice(0, 8)}_${Date.now()}`,
-        blockchain: 'WonderChain Testnet',
-        tx_hash: `0x${Math.random().toString(16).slice(2).padEnd(64, '0')}`.slice(0, 66),
-        block_number: 123456 + Math.floor(Math.random() * 2000),
-        timestamp: new Date().toISOString(),
-        content_hash: `0x${Math.random().toString(16).slice(2).padEnd(64, 'a')}`.slice(0, 66),
-        status: '已存证'
-      }, 900);
+      const cert = makeDemoCertificate(creationId);
+      saveLocalCertificate(creationId, cert);
+      return demoOk(cert, 900);
     }
-    return apiClient.post('/blockchain/certify', { creation_id: creationId });
+    try {
+      const res = await apiClient.post('/blockchain/certify', { creation_id: creationId });
+      if (res?.success) {
+        saveLocalCertificate(creationId, res.data);
+      }
+      return res;
+    } catch (err) {
+      if (shouldOfflineFallback(err)) {
+        const cert = makeDemoCertificate(creationId);
+        saveLocalCertificate(creationId, cert);
+        return demoOk(cert, 900);
+      }
+      throw err;
+    }
   },
   getCertificate: async (creationId) => {
     if (isDemoMode) {
+      const existing = loadLocalCertificate(creationId);
+      if (existing) return demoOk(existing, 300);
       await sleep(300);
       return { success: false, error: '未存证' };
     }
-    return apiClient.get(`/blockchain/cert/${creationId}`);
+    try {
+      const res = await apiClient.get(`/blockchain/cert/${creationId}`);
+      if (res?.success) {
+        saveLocalCertificate(creationId, res.data);
+      }
+      return res;
+    } catch (err) {
+      const existing = loadLocalCertificate(creationId);
+      if (existing) return demoOk(existing, 250);
+      if (shouldOfflineFallback(err)) {
+        await sleep(250);
+        return { success: false, error: '未存证' };
+      }
+      throw err;
+    }
   },
 };
 

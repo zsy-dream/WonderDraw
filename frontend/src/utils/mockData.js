@@ -772,7 +772,8 @@ export const getMockCreationDetail = (creationId) => {
 };
 
 export const getMockUserProgress = (userId) => {
-  const myCreations = mockCreations.filter((c) => String(c.user_id) === String(userId));
+  const mine = mockCreations.filter((c) => String(c.user_id) === String(userId));
+  const myCreations = mine.length > 0 ? mine : mockCreations.slice(0, Math.min(5, mockCreations.length));
   const total = myCreations.length;
   const first = myCreations[0]?.created_at;
   const last = myCreations[myCreations.length - 1]?.created_at;
