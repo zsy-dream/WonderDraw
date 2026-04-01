@@ -832,3 +832,37 @@ export const getMockUserProgress = (userId) => {
     insights
   };
 };
+
+/**
+ * 演示用的示例图片（无需上传，直接用于快速演示）
+ */
+export const demoSampleImages = [
+  {
+    id: 'demo_sky_castle',
+    name: '天空城堡',
+    url: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&h=600&fit=crop',
+    thumbnail: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=200&h=150&fit=crop',
+    description: '彩色城堡与彩虹'
+  },
+  {
+    id: 'demo_cat_adventure',
+    name: '小猫冒险',
+    url: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=800&h=600&fit=crop',
+    thumbnail: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=200&h=150&fit=crop',
+    description: '可爱的小猫咪'
+  },
+  {
+    id: 'demo_space_rocket',
+    name: '太空火箭',
+    url: 'https://images.unsplash.com/photo-1517976487492-5750f3195933?w=800&h=600&fit=crop',
+    thumbnail: 'https://images.unsplash.com/photo-1517976487492-5750f3195933?w=200&h=150&fit=crop',
+    description: '飞向太空的火箭'
+  },
+  {
+    id: 'demo_flower_garden',
+    name: '梦幻花园',
+    url: 'https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=800&h=600&fit=crop',
+    thumbnail: 'https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=200&h=150&fit=crop',
+    description: '五彩缤纷的花朵'
+  }
+];

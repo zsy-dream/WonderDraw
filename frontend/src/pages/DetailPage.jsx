@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { creationAPI, aiAPI } from '../services/api';
 import { useDemo } from '../contexts/DemoContext';
@@ -17,6 +17,7 @@ import { exportCreationVideo } from '../services/videoExport';
 function DetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const { state: demoState } = useDemo();
   const [creation, setCreation] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -36,6 +37,45 @@ function DetailPage() {
     try {
       setIsLoading(true);
       setError(null);
+
+      const stateCreation = location?.state?.demoCreation;
+      if (stateCreation && String(stateCreation.id) === String(id)) {
+        setCreation(stateCreation);
+        if (stateCreation.interactive_story) {
+          const currentNode = stateCreation.current_node || 'root';
+          const node = stateCreation.interactive_story[currentNode];
+          setStoryData({
+            story: stateCreation.story,
+            full_story: stateCreation.full_story,
+            interactive_story: stateCreation.interactive_story,
+            current_node: currentNode,
+            story_path: stateCreation.story_path || ['root'],
+            has_choices: node && node.choices && node.choices.length > 0,
+            choices: node ? node.choices : []
+          });
+        }
+        return;
+      }
+
+      const saved = localStorage.getItem(`demo_creation_${id}`);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        setCreation(parsed);
+        if (parsed?.interactive_story) {
+          const currentNode = parsed.current_node || 'root';
+          const node = parsed.interactive_story[currentNode];
+          setStoryData({
+            story: parsed.story,
+            full_story: parsed.full_story,
+            interactive_story: parsed.interactive_story,
+            current_node: currentNode,
+            story_path: parsed.story_path || ['root'],
+            has_choices: node && node.choices && node.choices.length > 0,
+            choices: node ? node.choices : []
+          });
+        }
+        return;
+      }
 
       if (forced === 'loading') {
         return;

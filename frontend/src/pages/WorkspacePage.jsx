@@ -9,7 +9,7 @@ import { useUser } from '../contexts/UserContext';
 import { artworkAPI, creationAPI, aiAPI } from '../services/api';
 // imageProcessor/videoGenerator 已经迁移到后端 API
 import { CREATION_STEPS, CREATION_STATUS, ERROR_MESSAGES } from '../utils/constants';
-import { mockWorkspaceCopy, mockWorkspaceGuidanceTemplates } from '../utils/mockData';
+import { mockWorkspaceCopy, mockWorkspaceGuidanceTemplates, getMockCreationDetail } from '../utils/mockData';
 
 /**
  * 神笔工作台
@@ -35,6 +35,77 @@ function WorkspacePage() {
   const [enhancedImage, setEnhancedImage] = useState(null);
   const [animation, setAnimation] = useState(null);
   const [story, setStory] = useState(null);
+
+  const startLocalDemoFlow = async (file) => {
+    const demoCreationId = `local_demo_${Date.now()}`;
+    const template = getMockCreationDetail('demo_creation_001');
+
+    setError(null);
+    setCreationStatus(CREATION_STATUS.PROCESSING);
+    setArtworkId(`local_artwork_${Date.now()}`);
+    setCreationId(demoCreationId);
+
+    const reader = new FileReader();
+    const dataUrl = await new Promise((resolve, reject) => {
+      reader.onload = (e) => resolve(e.target.result);
+      reader.onerror = () => reject(new Error('读取图片失败'));
+      reader.readAsDataURL(file);
+    });
+
+    setOriginalImage(dataUrl);
+
+    const demoCreation = {
+      ...(template || {}),
+      id: demoCreationId,
+      artwork_id: `local_artwork_${Date.now()}`,
+      original_image: dataUrl,
+      enhanced_image: template?.enhanced_image || dataUrl,
+      animation: template?.animation || null,
+      story: template?.story || '这是一个关于勇气与想象力的故事。',
+      full_story: template?.full_story || template?.story || '这是一个关于勇气与想象力的故事。',
+      interactive_story: template?.interactive_story || null,
+      current_node: 'root',
+      story_path: ['root'],
+      created_at: new Date().toISOString()
+    };
+
+    try {
+      localStorage.setItem(`demo_creation_${demoCreationId}`, JSON.stringify(demoCreation));
+    } catch (e) {
+      // ignore storage failure
+    }
+
+    setIsProcessing(true);
+    setCreationStep(CREATION_STEPS.ENHANCING);
+    setTimeout(() => {
+      setEnhancedImage(demoCreation.enhanced_image);
+      setCreationStep(CREATION_STEPS.ENHANCED);
+    }, 900);
+
+    setTimeout(() => {
+      setCreationStep(CREATION_STEPS.ANIMATING);
+    }, 1400);
+
+    setTimeout(() => {
+      setAnimation(demoCreation.animation);
+      setCreationStep(CREATION_STEPS.ANIMATED);
+    }, 2400);
+
+    setTimeout(() => {
+      setCreationStep(CREATION_STEPS.STORY_GEN);
+    }, 2700);
+
+    setTimeout(() => {
+      setStory(demoCreation.story);
+      setCreationStep(CREATION_STEPS.COMPLETED);
+      setCreationStatus(CREATION_STATUS.SUCCESS);
+      setIsProcessing(false);
+    }, 3600);
+
+    setTimeout(() => {
+      navigate(`/detail/${demoCreationId}`, { state: { demoCreation } });
+    }, 5200);
+  };
 
   // 检查登录状态
   useEffect(() => {
@@ -87,8 +158,14 @@ function WorkspacePage() {
       
     } catch (err) {
       console.error('Upload error:', err);
-      setError(err.message || ERROR_MESSAGES.UPLOAD_FAILED);
-      setCreationStatus(CREATION_STATUS.ERROR);
+      const msg = err?.message || ERROR_MESSAGES.UPLOAD_FAILED;
+      const shouldFallback = /405|method not allowed|network|failed to fetch/i.test(msg);
+      if (shouldFallback) {
+        await startLocalDemoFlow(file);
+      } else {
+        setError(msg);
+        setCreationStatus(CREATION_STATUS.ERROR);
+      }
     } finally {
       setIsProcessing(false);
     }
@@ -123,7 +200,11 @@ function WorkspacePage() {
       
       const storyResponse = await aiAPI.generateStory(artworkId, creationId);
       if (storyResponse.success && storyResponse.data) {
-        setStory(storyResponse.data.story || storyResponse.data);
+        const data = storyResponse.data;
+        const storyText = typeof data === 'string'
+          ? data
+          : (data?.story || data?.text || '');
+        setStory(storyText);
       }
       
       setCreationStep(CREATION_STEPS.COMPLETED);
@@ -136,7 +217,19 @@ function WorkspacePage() {
       
     } catch (err) {
       console.error('AI processing error:', err);
-      setError(err.message || ERROR_MESSAGES.PROCESSING_ERROR);
+      const msg = err?.message || ERROR_MESSAGES.PROCESSING_ERROR;
+      const shouldFallback = /405|method not allowed|network|failed to fetch/i.test(msg);
+      if (shouldFallback && originalImage) {
+        try {
+          const blob = await (await fetch(originalImage)).blob();
+          const file = new File([blob], 'demo.jpg', { type: blob.type || 'image/jpeg' });
+          await startLocalDemoFlow(file);
+          return;
+        } catch (e) {
+          // ignore fallback failure
+        }
+      }
+      setError(msg);
       setCreationStep(CREATION_STEPS.FAILED);
       setCreationStatus(CREATION_STATUS.ERROR);
     } finally {
