@@ -45,7 +45,7 @@ function WorkspacePage() {
       if (tid === 'demo_flower_garden') return 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4';
       if (tid === 'demo_space_rocket') return 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4';
       if (tid === 'demo_sky_castle') return 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4';
-      if (tid === 'demo_cat_adventure') return null;
+      if (tid === 'demo_cat_adventure') return 'https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.mp4';
       return template?.animation || null;
     };
 
