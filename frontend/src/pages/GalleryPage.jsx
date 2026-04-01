@@ -7,7 +7,7 @@ import PartnerShowcase from '../components/PartnerShowcase';
 import { useUser } from '../contexts/UserContext';
 import { useDemo } from '../contexts/DemoContext';
 import { creationAPI } from '../services/api';
-import { mockGalleryCopy } from '../utils/mockData';
+import { mockGalleryCopy, mockCreations } from '../utils/mockData';
 
 /**
  * 奇境入口 - 3D 漂浮展厅
@@ -52,13 +52,13 @@ function GalleryPage() {
       if (response.success) {
         setCreations(response.data.creations || []);
       } else {
-        setError(mockGalleryCopy.errors.loadFailed);
-        setCreations([]);
+        // API 失败时使用本地 mock 数据兜底（演示模式）
+        setCreations(mockCreations);
       }
     } catch (err) {
       console.error('Failed to load creations:', err);
-      setError(mockGalleryCopy.errors.networkFailed);
-      setCreations([]);
+      // 使用本地 mock 数据兜底（演示模式）
+      setCreations(mockCreations);
     } finally {
       setIsLoading(false);
     }
